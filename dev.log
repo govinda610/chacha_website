@@ -5,13 +5,58 @@
 🔗 Backend: http://localhost:8000
 🔗 Frontend: http://localhost:3000
 Press Ctrl+C to stop all services.
+INFO:     Will watch for changes in these directories: ['/Users/govindmittal/datascience-setup/chacha_website']
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [95018] using StatReload
 
 > frontend@0.1.0 dev
 > next dev
 
-INFO:     Will watch for changes in these directories: ['/Users/govindmittal/datascience-setup/chacha_website']
-INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [88724] using StatReload
+Process SpawnProcess-1:
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/uvicorn/server.py", line 62, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/asyncio/base_events.py", line 653, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/uvicorn/server.py", line 69, in serve
+    config.load()
+  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/uvicorn/config.py", line 458, in load
+    self.loaded_app = import_from_string(self.app)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+    module = importlib.import_module(module_str)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/Users/govindmittal/datascience-setup/chacha_website/backend/app/main.py", line 3, in <module>
+    from app.api.v1.api import api_router
+  File "/Users/govindmittal/datascience-setup/chacha_website/backend/app/api/v1/api.py", line 1, in <module>
+    from app.api.v1.endpoints import auth, products, categories, cart
+  File "/Users/govindmittal/datascience-setup/chacha_website/backend/app/api/v1/endpoints/cart.py", line 43, in <module>
+    @router.put("/{item_id}", response_model=Optional[CartItem])
+                                             ^^^^^^^^
+NameError: name 'Optional' is not defined
 ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
  We detected multiple lockfiles and selected the directory of /Users/govindmittal/pnpm-lock.yaml as the root directory.
  To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
@@ -20,111 +65,113 @@ INFO:     Started reloader process [88724] using StatReload
    * /Users/govindmittal/datascience-setup/chacha_website/frontend/package-lock.json
 
 ▲ Next.js 16.1.4 (Turbopack)
-INFO:     Started server process [88748]
-INFO:     Waiting for application startup.
 - Local:         http://localhost:3000
 - Network:       http://192.168.1.44:3000
 
-INFO:     Application startup complete.
 ✓ Starting...
-✓ Ready in 531ms
-INFO:     127.0.0.1:51194 - "POST /api/v1/auth/register HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51197 - "POST /api/v1/auth/login HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51199 - "GET /api/v1/auth/me HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51201 - "GET /api/v1/categories HTTP/1.1" 307 Temporary Redirect
-INFO:     127.0.0.1:51203 - "GET /api/v1/products?limit=1 HTTP/1.1" 307 Temporary Redirect
-WARNING:  StatReload detected changes in 'backend/app/seeds.py'. Reloading...
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [88748]
-INFO:     Started server process [88839]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-WARNING:  StatReload detected changes in 'backend/app/seeds.py'. Reloading...
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [88839]
-INFO:     Started server process [89104]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-INFO:     127.0.0.1:51221 - "GET /api/v1/categories HTTP/1.1" 307 Temporary Redirect
-INFO:     127.0.0.1:51223 - "GET /api/v1/products?limit=1 HTTP/1.1" 307 Temporary Redirect
-INFO:     127.0.0.1:51276 - "GET /api/v1/categories HTTP/1.1" 307 Temporary Redirect
-INFO:     127.0.0.1:51276 - "GET /api/v1/categories/ HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51278 - "GET /api/v1/products?limit=1 HTTP/1.1" 307 Temporary Redirect
-INFO:     127.0.0.1:51278 - "GET /api/v1/products/?limit=1 HTTP/1.1" 500 Internal Server Error
-ERROR:    Exception in ASGI application
+✓ Ready in 647ms
+WARNING:  StatReload detected changes in 'backend/tests/test_cart_api.py'. Reloading...
+Process SpawnProcess-2:
 Traceback (most recent call last):
-  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/uvicorn/protocols/http/h11_impl.py", line 404, in run_asgi
-    result = await app(  # type: ignore[func-returns-value]
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
-    return await self.app(scope, receive, send)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
-    await super().__call__(scope, receive, send)
-  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/starlette/applications.py", line 123, in __call__
-    await self.middleware_stack(scope, receive, send)
-  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/starlette/middleware/errors.py", line 186, in __call__
-    raise exc
-  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/starlette/middleware/errors.py", line 164, in __call__
-    await self.app(scope, receive, _send)
-  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/starlette/middleware/cors.py", line 83, in __call__
-    await self.app(scope, receive, send)
-  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
-    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
-  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
-    raise exc
-  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
-    await app(scope, receive, sender)
-  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/starlette/routing.py", line 762, in __call__
-    await self.middleware_stack(scope, receive, send)
-  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/starlette/routing.py", line 782, in app
-    await route.handle(scope, receive, send)
-  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/starlette/routing.py", line 297, in handle
-    await self.app(scope, receive, send)
-  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/starlette/routing.py", line 77, in app
-    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
-  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
-    raise exc
-  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
-    await app(scope, receive, sender)
-  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/starlette/routing.py", line 72, in app
-    response = await func(request)
-               ^^^^^^^^^^^^^^^^^^^
-  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/fastapi/routing.py", line 315, in app
-    content = await serialize_response(
-              ^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/fastapi/routing.py", line 155, in serialize_response
-    raise ResponseValidationError(
-fastapi.exceptions.ResponseValidationError: 1 validation errors:
-  {'type': 'int_type', 'loc': ('response', 0, 'category_id'), 'msg': 'Input should be a valid integer', 'input': None, 'url': 'https://errors.pydantic.dev/2.5/v/int_type'}
-
-WARNING:  StatReload detected changes in 'backend/app/schemas/product.py'. Reloading...
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/uvicorn/server.py", line 62, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/asyncio/base_events.py", line 653, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/uvicorn/server.py", line 69, in serve
+    config.load()
+  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/uvicorn/config.py", line 458, in load
+    self.loaded_app = import_from_string(self.app)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+    module = importlib.import_module(module_str)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/Users/govindmittal/datascience-setup/chacha_website/backend/app/main.py", line 3, in <module>
+    from app.api.v1.api import api_router
+  File "/Users/govindmittal/datascience-setup/chacha_website/backend/app/api/v1/api.py", line 1, in <module>
+    from app.api.v1.endpoints import auth, products, categories, cart
+  File "/Users/govindmittal/datascience-setup/chacha_website/backend/app/api/v1/endpoints/cart.py", line 43, in <module>
+    @router.put("/{item_id}", response_model=Optional[CartItem])
+                                             ^^^^^^^^
+NameError: name 'Optional' is not defined
+WARNING:  StatReload detected changes in 'backend/app/api/v1/endpoints/cart.py'. Reloading...
+Process SpawnProcess-3:
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/uvicorn/server.py", line 62, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/asyncio/base_events.py", line 653, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/uvicorn/server.py", line 69, in serve
+    config.load()
+  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/uvicorn/config.py", line 458, in load
+    self.loaded_app = import_from_string(self.app)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/govindmittal/datascience-setup/chacha_website/venv/lib/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+    module = importlib.import_module(module_str)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/Users/govindmittal/datascience-setup/chacha_website/backend/app/main.py", line 3, in <module>
+    from app.api.v1.api import api_router
+  File "/Users/govindmittal/datascience-setup/chacha_website/backend/app/api/v1/api.py", line 3, in <module>
+    api_router = APIRouter()
+                 ^^^^^^^^^
+NameError: name 'APIRouter' is not defined
+WARNING:  StatReload detected changes in 'backend/app/api/v1/api.py'. Reloading...
+INFO:     Started server process [99244]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'backend/tests/test_cart_api.py'. Reloading...
 INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
-INFO:     Finished server process [89104]
-INFO:     Started server process [90916]
+INFO:     Finished server process [99244]
+INFO:     Started server process [99252]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-WARNING:  StatReload detected changes in 'backend/app/seeds.py'. Reloading...
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [90916]
-INFO:     Started server process [91593]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-WARNING:  StatReload detected changes in 'backend/app/seeds.py'. Reloading...
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [91593]
-INFO:     Started server process [91600]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-INFO:     127.0.0.1:51309 - "GET /api/v1/categories/ HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51311 - "GET /api/v1/products/?limit=1 HTTP/1.1" 200 OK
+./run.sh: line 32: 95018 Killed: 9               $ROOT_DIR/venv/bin/uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000 --reload
+./run.sh: line 33: kill: (95018) - No such process
+./run.sh: line 33: kill: (95019) - No such process

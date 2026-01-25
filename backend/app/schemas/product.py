@@ -19,6 +19,9 @@ class ProductVariantBase(BaseModel):
     class Config:
         from_attributes = True
 
+class ProductVariant(ProductVariantBase):
+    id: int
+
 class CategoryBase(BaseModel):
     id: int
     name: str
@@ -43,7 +46,7 @@ class ProductBase(BaseModel):
 class Product(ProductBase):
     id: int
     images: List[ProductImageBase] = []
-    variants: List[ProductVariantBase] = []
+    variants: List[ProductVariant] = []
 
     class Config:
         from_attributes = True
