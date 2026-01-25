@@ -1,0 +1,30 @@
+# AI Workspace & Planning
+*.md
+!README.md
+brain/
+.agent/
+scripts/
+data/
+ui_inspiration/
+noris_product_cat_*.pdf
+*.xlsx
+enhanced_prompt.md
+initial_prompt.md
+
+# Environment & DB
+.env
+venv/
+*.db
+*.db-journal
+
+# Frontend
+node_modules/
+.next/
+dist/
+build/
+.pnpm-debug.log
+
+# System
+.DS_Store
+__pycache__/
+*.pyc
