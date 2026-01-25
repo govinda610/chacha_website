@@ -16,8 +16,9 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from app.core.config import settings
 from app.core.database import Base
-from app.models.user import User
-from app.models.product import Category, Product, ProductVariant, ProductImage, Address, Order
+from app.models.user import User, Address, CartItem
+from app.models.product import Brand, Category, Product, ProductVariant, ProductImage
+from app.models.order import Order, OrderItem, DeliveryZone
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -55,6 +56,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        render_as_batch=True,
     )
 
     with context.begin_transaction():
@@ -76,7 +78,9 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection, 
+            target_metadata=target_metadata,
+            render_as_batch=True,
         )
 
         with context.begin_transaction():

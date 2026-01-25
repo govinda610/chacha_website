@@ -7,8 +7,9 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from app.core.database import SessionLocal, engine
-from app.models.user import User, Address, Order
-from app.models.product import Category, Product, ProductVariant, ProductImage
+from app.models.user import User, Address, CartItem
+from app.models.product import Category, Product, ProductVariant, ProductImage, Brand
+from app.models.order import Order
 from app.core.database import Base
 
 # Ensure tables are created (though alembic should have done it)
@@ -21,6 +22,15 @@ PRODUCTS_PATH = DATA_DIR / "products_complete.json"
 def seed_data():
     db = SessionLocal()
     try:
+        # 0. Clear existing data
+        print("🧹 Cleaning up existing data...")
+        db.query(ProductImage).delete()
+        db.query(ProductVariant).delete()
+        db.query(Product).delete()
+        db.query(Category).delete()
+        db.query(Brand).delete()
+        db.commit()
+
         # 1. Seed Categories
         print("🌱 Seeding Categories...")
         with open(CATEGORIES_PATH, 'r') as f:
@@ -39,8 +49,8 @@ def seed_data():
             db.flush() # Get ID
             category_map[cat['name']] = db_cat.id
             
-            # Second pass: Subcategories
-            for sub in cat.get('subcategories', []):
+            # Second pass: Subcategories (using 'children' key from json)
+            for sub in cat.get('children', []):
                 db_sub = Category(
                     name=sub['name'],
                     slug=sub['slug'],
@@ -51,25 +61,44 @@ def seed_data():
                 db.flush()
                 category_map[sub['name']] = db_sub.id
         
-        print(f"✅ Seeded {len(category_map)} categories")
+        print(f"✅ Seeded {len(category_map)} categories and subcategories")
+
+        # 1.5 Seed Brands
+        print("🌱 Seeding Brands...")
+        with open(PRODUCTS_PATH, 'r') as f:
+            products_data = json.load(f)
+        
+        unique_brands = sorted(list(set(p['brand'] for p in products_data if p.get('brand'))))
+        brand_map = {}
+        for brand_name in unique_brands:
+            db_brand = Brand(
+                name=brand_name,
+                slug=brand_name.lower().replace(" ", "-")
+            )
+            db.add(db_brand)
+            db.flush()
+            brand_map[brand_name] = db_brand.id
+        print(f"✅ Seeded {len(brand_map)} brands")
 
         # 2. Seed Products
         print("🌱 Seeding Products...")
-        with open(PRODUCTS_PATH, 'r') as f:
-            products_data = json.load(f)
         
         product_count = 0
         variant_count = 0
         
         for p_data in products_data:
             # Map subcategory to category_id
-            cat_name = p_data.get('subcategory') or p_data.get('category')
+            cat_name = p_data.get('subcategory')
             cat_id = category_map.get(cat_name)
+            
+            # Fallback to parent category if subcategory not found
+            if not cat_id:
+                cat_id = category_map.get(p_data.get('category'))
             
             db_product = Product(
                 name=p_data['name'],
                 slug=p_data['slug'],
-                brand=p_data['brand'],
+                brand_id=brand_map.get(p_data['brand']),
                 category_id=cat_id,
                 description=p_data.get('description'),
                 specifications=p_data.get('specifications'),

@@ -3,6 +3,17 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.core.database import Base
 
+class Brand(Base):
+    __tablename__ = "brands"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True, nullable=False)
+    slug = Column(String, unique=True, index=True, nullable=False)
+    logo_url = Column(String, nullable=True)
+    is_active = Column(Boolean, default=True)
+    
+    products = relationship("Product", back_populates="brand")
+
 class Category(Base):
     __tablename__ = "categories"
 
@@ -20,7 +31,7 @@ class Product(Base):
     __tablename__ = "products"
 
     id = Column(Integer, primary_key=True, index=True)
-    brand = Column(String, default="Noris")
+    brand_id = Column(Integer, ForeignKey("brands.id"))
     category_id = Column(Integer, ForeignKey("categories.id"))
     name = Column(String, index=True, nullable=False)
     slug = Column(String, unique=True, index=True, nullable=False)
@@ -38,6 +49,7 @@ class Product(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     category = relationship("Category", back_populates="products")
+    brand = relationship("Brand", back_populates="products")
     variants = relationship("ProductVariant", back_populates="product")
     images = relationship("ProductImage", back_populates="product")
 

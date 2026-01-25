@@ -12,14 +12,32 @@ class Address(Base):
     __tablename__ = "addresses"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
-    full_address = Column(String)
+    
+    label = Column(String) # Home, Office, Clinic
+    full_address = Column(String, nullable=False)
+    city = Column(String, nullable=False)
+    state = Column(String, nullable=False)
+    pincode = Column(String, nullable=False)
+    is_default = Column(Boolean, default=False)
+    
     user = relationship("User", back_populates="addresses")
+    orders = relationship("Order", back_populates="address")
 
-class Order(Base):
-    __tablename__ = "orders"
+class CartItem(Base):
+    __tablename__ = "cart_items"
+    
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
-    user = relationship("User", back_populates="orders")
+    product_id = Column(Integer, ForeignKey("products.id"))
+    variant_id = Column(Integer, ForeignKey("product_variants.id"), nullable=True)
+    quantity = Column(Integer, default=1)
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    user = relationship("User", back_populates="cart_items")
+    product = relationship("Product")
+    variant = relationship("ProductVariant")
 
 class User(Base):
     __tablename__ = "users"
@@ -47,3 +65,4 @@ class User(Base):
 
     addresses = relationship("Address", back_populates="user")
     orders = relationship("Order", back_populates="user")
+    cart_items = relationship("CartItem", back_populates="user")

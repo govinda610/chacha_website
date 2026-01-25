@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.api.v1.api import api_router
+from app.core.config import settings
 
 app = FastAPI(
     title="DentSupply API",
@@ -24,6 +26,8 @@ app.add_middleware(
 @app.get("/")
 async def root():
     return {"message": "Welcome to DentSupply API", "status": "online"}
+
+app.include_router(api_router, prefix=settings.API_V1_STR)
 
 @app.get("/health")
 async def health_check():
