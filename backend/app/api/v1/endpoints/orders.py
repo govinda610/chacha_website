@@ -43,3 +43,17 @@ def read_order(
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
     return order
+
+@router.post("/{order_id}/cancel", response_model=Order)
+def cancel_order(
+    order_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Cancel an order.
+    """
+    order = crud_order.get_order(db, user_id=current_user.id, order_id=order_id)
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    return crud_order.cancel_order(db, db_order=order)

@@ -8,6 +8,11 @@ class UserBase(BaseModel):
     full_name: Optional[str] = None
     is_active: Optional[bool] = True
     role: Optional[str] = "customer"
+    gst_number: Optional[str] = None
+    dental_license: Optional[str] = None
+    tier: Optional[str] = "Standard"
+    credit_limit: Optional[float] = 0.0
+    credit_used: Optional[float] = 0.0
 
 # Properties to receive via API on creation
 class UserCreate(UserBase):

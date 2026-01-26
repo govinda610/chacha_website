@@ -1,0 +1,19 @@
+import { api } from "@/lib/axios"
+import type { Order } from "@/types/order"
+
+export const ordersService = {
+    async getMyOrders(): Promise<Order[]> {
+        const { data } = await api.get<Order[]>("/orders/")
+        return data
+    },
+
+    async getOrderById(id: number): Promise<Order> {
+        const { data } = await api.get<Order>(`/orders/${id}`)
+        return data
+    },
+
+    async createOrder(addressId: number): Promise<Order> {
+        const { data } = await api.post<Order>("/orders/", { shipping_address_id: addressId })
+        return data
+    }
+}

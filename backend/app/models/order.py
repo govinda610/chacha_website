@@ -84,3 +84,11 @@ class DeliveryZone(Base):
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+class SiteSettings(Base):
+    __tablename__ = "site_settings"
+
+    key = Column(String, primary_key=True, index=True)
+    value = Column(JSON, nullable=False)
+    description = Column(Text, nullable=True)
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())

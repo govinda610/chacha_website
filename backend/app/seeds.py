@@ -154,6 +154,53 @@ def seed_data():
         db.commit()
         print(f"✅ Seeded {product_count} products and {variant_count} variants")
         
+        # 3. Seed Admin User
+        print("🌱 Seeding Admin User...")
+        admin_email = "admin@dentsupply.com"
+        if not db.query(User).filter(User.email == admin_email).first():
+            from app.core.security import get_password_hash
+            db_admin = User(
+                email=admin_email,
+                hashed_password=get_password_hash("admin123"), # Secure in prod via env
+                full_name="System Admin",
+                phone="0000000000",
+                role="admin",
+                is_active=True,
+                is_verified=True
+            )
+            db.add(db_admin)
+            print("✅ Admin user created (admin@dentsupply.com / admin123)")
+        
+        # 4. Seed Delivery Zones
+        print("🌱 Seeding Delivery Zones...")
+        from app.models.order import DeliveryZone
+        if not db.query(DeliveryZone).first():
+            zones = [
+                {"name": "Intra-city (Local)", "cities": ["Mumbai", "Thane", "Navi Mumbai"], "base_fee": 0, "free_delivery_above": 2000, "estimated_hours": 24},
+                {"name": "Inter-city (State)", "cities": ["Pune", "Nashik", "Nagpur"], "base_fee": 150, "free_delivery_above": 5000, "estimated_hours": 48},
+                {"name": "National", "cities": ["Delhi", "Bangalore", "Chennai", "Kolkata"], "base_fee": 250, "free_delivery_above": 10000, "estimated_hours": 72}
+            ]
+            for z in zones:
+                db_zone = DeliveryZone(**z)
+                db.add(db_zone)
+            print("✅ 3 Delivery Zones created")
+            
+        # 5. Seed Initial Settings
+        print("🌱 Seeding Site Settings...")
+        from app.models.order import SiteSettings
+        settings = [
+            {"key": "min_order_value", "value": 0, "description": "Minimum order value required to checkout"},
+            {"key": "credit_enabled", "value": False, "description": "Enable credit-based payments for certified doctors"},
+            {"key": "gst_rate", "value": 18, "description": "Default GST rate percentage"}
+        ]
+        for s in settings:
+            if not db.query(SiteSettings).filter(SiteSettings.key == s["key"]).first():
+                db_setting = SiteSettings(**s)
+                db.add(db_setting)
+        print("✅ Initial site settings seeded")
+
+        db.commit()
+        
     except Exception as e:
         db.rollback()
         print(f"❌ Error seeding data: {e}")

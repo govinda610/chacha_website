@@ -9,6 +9,16 @@ class ProductImageBase(BaseModel):
     class Config:
         from_attributes = True
 
+class Brand(BaseModel):
+    id: int
+    name: str
+    slug: str
+    logo_url: Optional[str] = None
+    is_active: bool = True
+
+    class Config:
+        from_attributes = True
+
 class ProductVariantBase(BaseModel):
     sku: str
     name: str

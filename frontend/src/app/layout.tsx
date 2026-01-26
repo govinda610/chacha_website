@@ -1,28 +1,20 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
+import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
+import { MobileNav } from "@/components/layout/mobile-nav";
+import { AuthProvider } from "@/context/auth-context";
+import { CartProvider } from "@/context/cart-context";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 import type { Viewport } from "next";
 
 export const metadata: Metadata = {
-  title: "DentSupply | B2B Dental Marketplace",
-  description: "Quick commerce for dental implants and prosthetics",
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "DentSupply",
-  },
+  title: "DentSupply - India's Trusted Dental Marketplace",
+  description: "Premium dental implants, instruments, and supplies.",
 };
 
 export const viewport: Viewport = {
@@ -40,10 +32,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <body className={`${inter.variable} font-sans antialiased min-h-screen flex flex-col`}>
+        <AuthProvider>
+          <CartProvider>
+            <Header />
+            <main className="flex-1 bg-muted/5">
+              {children}
+            </main>
+            <Footer />
+            <MobileNav />
+            <Toaster />
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -98,3 +98,23 @@ def get_orders(db: Session, user_id: int) -> List[Order]:
 
 def get_order(db: Session, user_id: int, order_id: int) -> Optional[Order]:
     return db.query(Order).filter(Order.id == order_id, Order.user_id == user_id).first()
+
+def cancel_order(db: Session, db_order: Order) -> Order:
+    if db_order.status in [OrderStatus.SHIPPED, OrderStatus.DELIVERED, OrderStatus.CANCELLED]:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Order cannot be cancelled in state: {db_order.status}"
+        )
+    
+    # Restore stock
+    for item in db_order.items:
+        if item.variant_id:
+            variant = db.query(ProductVariant).filter(ProductVariant.id == item.variant_id).first()
+            if variant:
+                variant.stock_quantity += item.quantity
+    
+    db_order.status = OrderStatus.CANCELLED
+    db.add(db_order)
+    db.commit()
+    db.refresh(db_order)
+    return db_order
