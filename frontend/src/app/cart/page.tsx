@@ -73,7 +73,7 @@ export default function CartPage() {
                                                 </button>
                                             </div>
                                             <p className="text-sm text-muted-foreground">
-                                                {item.product_variant_id ? "Variant ID: " + item.product_variant_id : "Standard"}
+                                                {item.variant ? item.variant.name : "Standard"}
                                             </p>
                                         </div>
 

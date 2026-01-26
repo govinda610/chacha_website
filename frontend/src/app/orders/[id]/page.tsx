@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { ChevronLeft, Loader2, MapPin, Package } from "lucide-react"
 import { format } from "date-fns"
+import { toast } from "sonner"
 
 export default function OrderDetailPage() {
     const params = useParams()
@@ -41,7 +42,7 @@ export default function OrderDetailPage() {
             <div className="flex flex-col md:flex-row justify-between items-start mb-8 gap-4">
                 <div>
                     <div className="flex items-center gap-3">
-                        <h1 className="text-3xl font-bold">Order #{order.id}</h1>
+                        <h1 className="text-3xl font-bold">Order {order.order_number || `#${order.id}`}</h1>
                         <Badge variant={order.status === "delivered" ? "default" : "secondary"} className="text-base px-3">
                             {order.status}
                         </Badge>
@@ -50,7 +51,26 @@ export default function OrderDetailPage() {
                         Placed on {format(new Date(order.created_at), "Pk")}
                     </p>
                 </div>
-                {/* <Button variant="outline">Download Invoice</Button> */}
+                {order.status === 'pending' && (
+                    <Button variant="destructive" onClick={async () => {
+                        if (!confirm("Are you sure you want to cancel API order?")) return;
+                        try {
+                            // Assuming service has cancelOrder method, or create inline
+                            // ordersService.cancelOrder(id) // Need to add to service first
+                            // Using direct api call for now or update service
+                            // Let's rely on adding to service in a moment.
+                            // But better to stick to pattern:
+                            await ordersService.cancelOrder(order.id)
+                            toast.success("Order cancelled")
+                            router.refresh() // or reload
+                            window.location.reload()
+                        } catch (e) {
+                            toast.error("Failed to cancel order")
+                        }
+                    }}>
+                        Cancel Order
+                    </Button>
+                )}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -71,12 +91,11 @@ export default function OrderDetailPage() {
                                         />
                                     </div>
                                     <div className="flex-1">
-                                        <h3 className="font-semibold">{item.product?.name}</h3>
-                                        <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
-                                        <p className="font-medium mt-1">₹{item.price.toLocaleString()}</p>
+                                        <h3 className="font-semibold">{item.product_name || item.product?.name}</h3>
+                                        <p className="text-sm text-muted-foreground">Qty: {item.quantity} × ₹{item.unit_price.toLocaleString()}</p>
                                     </div>
                                     <div className="text-right font-bold">
-                                        ₹{(item.price * item.quantity).toLocaleString()}
+                                        ₹{item.total_price.toLocaleString()}
                                     </div>
                                 </div>
                             ))}
@@ -108,8 +127,15 @@ export default function OrderDetailPage() {
                         <Separator />
                         <div className="flex justify-between text-sm">
                             <span className="text-muted-foreground">Subtotal</span>
-                            <span>₹{order.total_amount.toLocaleString()}</span>
-                            {/* Simplified logic since backend stores final total */}
+                            <span>₹{order.subtotal.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Shipping</span>
+                            <span>{order.shipping_fee > 0 ? `₹${order.shipping_fee.toLocaleString()}` : 'Free'}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Tax</span>
+                            <span>₹{order.tax_amount.toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between text-sm">
                             <span className="text-muted-foreground">Payment Status</span>
@@ -123,6 +149,6 @@ export default function OrderDetailPage() {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }

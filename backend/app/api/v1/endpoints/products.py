@@ -12,15 +12,17 @@ def read_products(
     db: Session = Depends(deps.get_db),
     category_id: Optional[int] = None,
     brand_id: Optional[int] = None,
+    search: Optional[str] = Query(None, alias="q"),
     skip: int = 0,
     limit: int = 100,
 ) -> Any:
     """
-    Retrieve products.
+    Retrieve products with optional filtering by category, brand, and search query.
     """
     return crud_product.get_products(
-        db, category_id=category_id, brand_id=brand_id, skip=skip, limit=limit
+        db, category_id=category_id, brand_id=brand_id, search=search, skip=skip, limit=limit
     )
+
 
 @router.get("/search", response_model=List[Product])
 def search_products(

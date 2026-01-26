@@ -30,11 +30,11 @@ export function Footer() {
                     <div className="space-y-4">
                         <h3 className="font-bold text-foreground">Shop</h3>
                         <ul className="space-y-2 text-sm text-muted-foreground">
-                            <li><Link href="/products?category=implants" className="hover:text-primary hover:underline">Dental Implants</Link></li>
-                            <li><Link href="/products?category=prosthetics" className="hover:text-primary hover:underline">Prosthetics</Link></li>
-                            <li><Link href="/products?category=instruments" className="hover:text-primary hover:underline">Instruments</Link></li>
-                            <li><Link href="/products?category=consumables" className="hover:text-primary hover:underline">Consumables</Link></li>
-                            <li><Link href="/products?category=equipment" className="hover:text-primary hover:underline">Equipment</Link></li>
+                            <li><Link href="/products?category_id=19" className="hover:text-primary hover:underline">Implants</Link></li>
+                            <li><Link href="/products?category_id=1" className="hover:text-primary hover:underline">Abutments</Link></li>
+                            <li><Link href="/products?category_id=24" className="hover:text-primary hover:underline">Prosthetics</Link></li>
+                            <li><Link href="/products?category_id=22" className="hover:text-primary hover:underline">Instruments</Link></li>
+                            <li><Link href="/products?category_id=9" className="hover:text-primary hover:underline">Accessories</Link></li>
                         </ul>
                     </div>
 

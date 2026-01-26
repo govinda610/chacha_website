@@ -26,12 +26,21 @@ function ProductsContent() {
     const [loading, setLoading] = useState(true)
     const [total, setTotal] = useState(0)
 
+    // Known category names for matching query parameter
+    const CATEGORY_NAMES = ["Implants", "Prosthetics", "Instruments", "Regenerative", "Equipment", "Supplies"]
+
     // Filter States
-    const initialSearch = searchParams.get("q") || ""
+    const queryParam = searchParams.get("q") || ""
+    // Check if the query parameter matches a category name (case-insensitive)
+    const matchedCategory = CATEGORY_NAMES.find(cat => cat.toLowerCase() === queryParam.toLowerCase())
+
+    // If query matches a category name, don't use it as search text
+    const initialSearch = matchedCategory ? "" : queryParam
     const [search, setSearch] = useState(initialSearch)
     const [priceRange, setPriceRange] = useState([0, 50000])
     const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.get("category_id") || "all")
     const [sort, setSort] = useState("newest")
+    const [categoryMatchPending, setCategoryMatchPending] = useState(!!matchedCategory)
 
     const debouncedSearch = useDebounce(search, 500)
 
@@ -43,6 +52,46 @@ function ProductsContent() {
     useEffect(() => {
         productService.getCategories().then(setCategories).catch(console.error)
     }, [])
+
+    // Sync state with URL parameters when they change (e.g. navigation from header)
+    useEffect(() => {
+        const catId = searchParams.get("category_id")
+        if (catId) {
+            setSelectedCategory(catId)
+        } else {
+            // Only reset to all if we are not matching a text category (handled below)
+            // and actually conducting a navigation that clears category
+            if (!matchedCategory && !categoryMatchPending) {
+                // If we are just arriving without category_id, we might want to keep it 'all'
+                // But careful not to overwrite user selection if they just cleared it
+                // For now, let's trust the URL. If URL has no category, it's 'all'
+                setSelectedCategory("all")
+            }
+        }
+
+        const q = searchParams.get("q")
+        if (q !== null && q !== search) {
+            setSearch(q)
+        }
+
+        const p = searchParams.get("page")
+        if (p) {
+            setPage(parseInt(p))
+        }
+    }, [searchParams, matchedCategory, categoryMatchPending])
+
+    // Match category by name from query parameter after categories are loaded
+    useEffect(() => {
+        if (matchedCategory && categories.length > 0 && categoryMatchPending) {
+            const foundCategory = categories.find(cat =>
+                cat.name.toLowerCase() === matchedCategory.toLowerCase()
+            )
+            if (foundCategory) {
+                setSelectedCategory(String(foundCategory.id))
+            }
+            setCategoryMatchPending(false)
+        }
+    }, [matchedCategory, categories, categoryMatchPending])
 
     // Fetch Products when filters change
     useEffect(() => {
@@ -84,14 +133,18 @@ function ProductsContent() {
     }, [debouncedSearch, selectedCategory, page, router])
 
 
+    // Organize categories into tree structure
+    const parentCategories = categories.filter(c => !c.parent_id)
+    const getChildren = (parentId: number) => categories.filter(c => c.parent_id === parentId)
+
     const FilterContent = () => (
         <div className="space-y-6">
             <div>
                 <h3 className="text-sm font-semibold mb-3">Categories</h3>
-                <div className="space-y-2">
+                <div className="space-y-1">
                     <Button
                         variant={selectedCategory === "all" ? "secondary" : "ghost"}
-                        className="w-full justify-start h-auto min-h-[2rem] text-sm text-left font-medium whitespace-normal py-2 px-4"
+                        className="w-full justify-start h-auto min-h-[2rem] text-sm text-left font-medium whitespace-normal py-2 px-3"
                         onClick={() => {
                             setSelectedCategory("all")
                             setPage(1)
@@ -99,18 +152,32 @@ function ProductsContent() {
                     >
                         All Products
                     </Button>
-                    {categories.map(cat => (
-                        <Button
-                            key={cat.id}
-                            variant={selectedCategory === String(cat.id) ? "secondary" : "ghost"}
-                            className="w-full justify-start h-auto min-h-[2rem] text-sm pl-4 text-left font-medium whitespace-normal py-2"
-                            onClick={() => {
-                                setSelectedCategory(String(cat.id))
-                                setPage(1)
-                            }}
-                        >
-                            {cat.name}
-                        </Button>
+                    {parentCategories.map(parent => (
+                        <div key={parent.id}>
+                            <Button
+                                variant={selectedCategory === String(parent.id) ? "secondary" : "ghost"}
+                                className="w-full justify-start h-auto min-h-[2rem] text-sm text-left font-semibold whitespace-normal py-2 px-3"
+                                onClick={() => {
+                                    setSelectedCategory(String(parent.id))
+                                    setPage(1)
+                                }}
+                            >
+                                {parent.name}
+                            </Button>
+                            {getChildren(parent.id).map(child => (
+                                <Button
+                                    key={child.id}
+                                    variant={selectedCategory === String(child.id) ? "secondary" : "ghost"}
+                                    className="w-full justify-start h-auto min-h-[2rem] text-xs text-left text-muted-foreground whitespace-normal py-1.5 pl-6"
+                                    onClick={() => {
+                                        setSelectedCategory(String(child.id))
+                                        setPage(1)
+                                    }}
+                                >
+                                    {child.name}
+                                </Button>
+                            ))}
+                        </div>
                     ))}
                 </div>
             </div>

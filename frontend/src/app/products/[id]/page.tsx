@@ -63,8 +63,10 @@ export default function ProductDetailPage() {
 
     if (!product) return null
 
-    const isOutOfStock = product.stock_quantity <= 0
-
+    // For products with variants, check if any variant has stock
+    const hasVariants = product.has_variants || (product.variants && product.variants.length > 0)
+    const totalVariantStock = product.variants?.reduce((sum, v) => sum + v.stock_quantity, 0) ?? 0
+    const isOutOfStock = hasVariants ? totalVariantStock <= 0 : false
 
 
     const handleAddToCart = async () => {
@@ -120,7 +122,9 @@ export default function ProductDetailPage() {
                         </span>
                         <h1 className="text-3xl lg:text-4xl font-bold leading-tight">{product.name}</h1>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <span>SKU: {product.sku}</span>
+                            {product.variants && product.variants.length > 0 && (
+                                <span>{product.variants.length} variants available</span>
+                            )}
                             {isOutOfStock ? (
                                 <Badge variant="destructive">Out of Stock</Badge>
                             ) : (

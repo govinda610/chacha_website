@@ -46,7 +46,7 @@ export default function RegisterPage() {
                 email: values.email,
                 password: values.password,
                 full_name: values.fullName,
-                phone_number: values.phone,
+                phone: values.phone,
                 gst_number: values.gstNumber || undefined,
                 dental_license: values.dentalLicense || undefined
             })

@@ -13,7 +13,14 @@ export const ordersService = {
     },
 
     async createOrder(addressId: number): Promise<Order> {
-        const { data } = await api.post<Order>("/orders/", { shipping_address_id: addressId })
+        const { data } = await api.post<Order>("/orders/", {
+            address_id: addressId,
+            payment_method: "cod"
+        })
         return data
+    },
+
+    async cancelOrder(id: number): Promise<void> {
+        await api.post(`/orders/${id}/cancel`)
     }
 }

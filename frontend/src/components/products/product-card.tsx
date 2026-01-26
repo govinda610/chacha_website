@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import type { Product } from "@/types/product"
+import { useCart } from "@/context/cart-context"
 
 interface ProductCardProps {
     product: Product
@@ -14,13 +15,21 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, variant = "default" }: ProductCardProps) {
-    const isOutOfStock = product.stock_quantity <= 0
-    const isLowStock = product.stock_quantity > 0 && product.stock_quantity < 10
+    const { addItem, isLoading } = useCart()
+
+    // Handle variants - if product has variants, don't show stock at product level
+    const hasVariants = product.has_variants || (product.variants && product.variants.length > 0)
 
     // Calculate discount if any
     const discount = product.base_price > product.selling_price
         ? Math.round(((product.base_price - product.selling_price) / product.base_price) * 100)
         : 0
+
+    const handleAddToCart = async (e: React.MouseEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        await addItem(product.id, 1)
+    }
 
     return (
         <Card className={cn("group overflow-hidden transition-all duration-300 hover:shadow-lg border-muted",
@@ -32,8 +41,9 @@ export function ProductCard({ product, variant = "default" }: ProductCardProps) 
                     {discount > 0 && (
                         <Badge className="bg-red-500 hover:bg-red-600 text-white border-0">{discount}% OFF</Badge>
                     )}
-                    {isOutOfStock && <Badge variant="destructive">Out of Stock</Badge>}
-                    {isLowStock && <Badge variant="secondary" className="bg-orange-100 text-orange-700">Low Stock</Badge>}
+                    {hasVariants && (
+                        <Badge variant="secondary" className="bg-blue-100 text-blue-700">Multiple Options</Badge>
+                    )}
                 </div>
 
                 {/* Image Area */}
@@ -59,7 +69,8 @@ export function ProductCard({ product, variant = "default" }: ProductCardProps) 
                         <Button
                             size="icon"
                             className="rounded-full h-10 w-10 shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75"
-                            disabled={isOutOfStock}
+                            disabled={isLoading}
+                            onClick={handleAddToCart}
                         >
                             <ShoppingCart className="h-4 w-4" />
                         </Button>

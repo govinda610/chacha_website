@@ -58,7 +58,7 @@ export default function OrdersPage() {
                         <TableBody>
                             {orders.map((order) => (
                                 <TableRow key={order.id}>
-                                    <TableCell className="font-medium">#{order.id}</TableCell>
+                                    <TableCell className="font-medium">{order.order_number || `#${order.id}`}</TableCell>
                                     <TableCell>{format(new Date(order.created_at), "MMM d, yyyy")}</TableCell>
                                     <TableCell>
                                         <Badge variant={

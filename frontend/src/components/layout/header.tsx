@@ -13,6 +13,19 @@ export function Header() {
     const { user, logout } = useAuth()
     const { itemCount } = useCart()
     const router = useRouter()
+
+    const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        const query = (e.currentTarget.elements.namedItem("q") as HTMLInputElement).value
+        if (query.trim()) {
+            router.push(`/products?q=${encodeURIComponent(query)}`)
+        }
+    }
+
+    const handleCategoryClick = (category: string) => {
+        router.push(`/products?q=${encodeURIComponent(category)}`)
+    }
+
     return (
         <header className="flex flex-col w-full sticky top-0 z-[50] bg-background/80 backdrop-blur-md shadow-sm border-b">
             <div className="container mx-auto py-3 px-4 flex items-center gap-4">
@@ -37,13 +50,14 @@ export function Header() {
 
                 {/* Search */}
                 <div className="flex-1 relative group max-w-2xl">
-                    <div className="relative">
+                    <form onSubmit={handleSearch} className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                         <Input
+                            name="q"
                             placeholder="Search for 'Implants'..."
                             className="w-full pl-10 bg-muted/50 border-transparent focus:bg-background focus:border-primary/20 transition-all rounded-xl h-11"
                         />
-                    </div>
+                    </form>
                 </div>
 
                 {/* Actions */}
@@ -53,7 +67,7 @@ export function Header() {
                             <Link href="/orders">
                                 <Button variant="ghost" className="gap-2 font-medium hover:bg-muted/50">
                                     <User className="h-5 w-5" />
-                                    <span className="truncate max-w-[100px]">{user.full_name.split(' ')[0]}</span>
+                                    <span className="truncate max-w-[100px]">{user.full_name?.split(' ')[0] || 'Account'}</span>
                                 </Button>
                             </Link>
                             <Button variant="ghost" size="sm" onClick={logout} className="text-muted-foreground hover:text-destructive">
@@ -90,15 +104,22 @@ export function Header() {
                                 All Products
                             </Button>
                         </Link>
-                        {["Implants", "Prosthetics", "Instruments", "Regenerative", "Equipment", "Supplies"].map((cat) => (
-                            <Button
-                                key={cat}
-                                variant="ghost"
-                                size="sm"
-                                className="rounded-full px-4 text-xs text-muted-foreground hover:text-primary hover:bg-primary/5"
+                        {/* Main Category buttons with parent category_ids */}
+                        {[
+                            { name: "Implants", categoryId: 19 },
+                            { name: "Abutments", categoryId: 1 },
+                            { name: "Prosthetics", categoryId: 24 },
+                            { name: "Instruments", categoryId: 22 },
+                            { name: "Accessories", categoryId: 9 },
+                            { name: "Attachments", categoryId: 15 },
+                        ].map((cat) => (
+                            <Link
+                                key={cat.name}
+                                href={`/products?category_id=${cat.categoryId}`}
+                                className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-primary hover:bg-primary/5 h-8"
                             >
-                                {cat}
-                            </Button>
+                                {cat.name}
+                            </Link>
                         ))}
                     </div>
                 </div>

@@ -30,9 +30,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
         try {
             const data = await cartService.getCart()
             setCart(data)
-        } catch (error) {
-            // Silent error commonly if not logged in
-            console.log("Cart fetch failed (likely guest):", error)
+        } catch (error: any) {
+            // Silent error if not logged in (401)
+            if (error.response?.status !== 401) {
+                console.error("Cart fetch failed:", error)
+            }
             setCart(null)
         }
     }
@@ -45,14 +47,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setIsLoading(true)
         try {
             // Optimistic or wait? Wait is safer for stock checks
-            await cartService.addToCart({ product_id: productId, quantity, product_variant_id: variantId })
+            await cartService.addToCart({ product_id: productId, quantity, variant_id: variantId })
             await refreshCart()
             toast.success("Added to cart")
         } catch (err: any) {
             console.error(err)
             if (err.response?.status === 401) {
                 toast.error("Please login to add items to cart")
-                // Optional: router.push("/auth/login")
+                window.location.href = "/auth/login" // Using window.location to ensure full redirect
             } else {
                 toast.error("Failed to add to cart")
             }

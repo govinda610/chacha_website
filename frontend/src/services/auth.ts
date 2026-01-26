@@ -8,7 +8,7 @@ export const authService = {
             email: data.email,
             password: data.password,
             full_name: data.full_name,
-            phone: data.phone_number || "", // Backend expects 'phone', not 'phone_number'
+            phone: data.phone,
             gst_number: data.gst_number,
             dental_license: data.dental_license
         }

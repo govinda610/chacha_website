@@ -1,26 +1,24 @@
 export interface ProductImage {
-    id: number
-    product_id: number
     image_url: string
-    image_type: "main" | "thumbnail" | "gallery"
+    image_type: string
     display_order: number
 }
 
 export interface ProductVariant {
     id: number
-    product_id: number
     name: string
     sku: string
-    price_adjustment: number
+    price: number
     stock_quantity: number
+    specifications?: Record<string, any>
 }
 
 export interface Category {
     id: number
     name: string
     slug: string
-    parent_id?: number
-    image_url?: string
+    parent_id?: number | null
+    display_order?: number
     children?: Category[]
 }
 
@@ -29,21 +27,21 @@ export interface Brand {
     name: string
     slug: string
     logo_url?: string
+    is_active?: boolean
 }
 
 export interface Product {
     id: number
     name: string
     slug: string
-    sku: string
-    description: string
-    specifications: Record<string, any>
+    description?: string
+    specifications?: Record<string, any>
     base_price: number
     selling_price: number
-    stock_quantity: number
+    has_variants?: boolean
     is_active: boolean
-    brand_id: number
-    category_id: number
+    brand_id?: number
+    category_id?: number
 
     // Relations
     brand?: Brand
