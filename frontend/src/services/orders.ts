@@ -12,10 +12,10 @@ export const ordersService = {
         return data
     },
 
-    async createOrder(addressId: number): Promise<Order> {
+    async createOrder(addressId: number, paymentMethod: string = "cod"): Promise<Order> {
         const { data } = await api.post<Order>("/orders/", {
             address_id: addressId,
-            payment_method: "cod"
+            payment_method: paymentMethod
         })
         return data
     },

@@ -11,6 +11,7 @@ import { CheckCircle2, Truck, CreditCard, Lock } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { ordersService } from "@/services/orders"
+import { userService } from "@/services/user"
 
 export default function CheckoutPage() {
     const { cart, items, removeItem, clearCart } = useCart()
@@ -27,6 +28,8 @@ export default function CheckoutPage() {
         pincode: "",
         state: ""
     })
+    const [savedAddressId, setSavedAddressId] = useState<number | null>(null)
+    const [paymentMethod, setPaymentMethod] = useState("razorpay")
 
     if (!cart || items.length === 0) {
         return <div className="p-8 text-center bg-muted/5">Your cart is empty</div>
@@ -36,40 +39,51 @@ export default function CheckoutPage() {
     const gst = subtotal * 0.18
     const total = subtotal + gst
 
-    const handleAddressSubmit = (e: React.FormEvent) => {
+    const handleAddressSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!address.line1 || !address.city || !address.pincode) {
+        if (!address.line1 || !address.city || !address.pincode || !address.state) {
             toast.error("Please fill all fields")
             return
         }
-        setStep(2)
+
+        setLoading(true)
+        try {
+            // Save address to backend
+            const savedAddr = await userService.addAddress({
+                full_address: address.line1,
+                city: address.city,
+                state: address.state,
+                pincode: address.pincode,
+                label: "Checkout Address"
+            })
+            setSavedAddressId(savedAddr.id)
+            setStep(2)
+        } catch (error) {
+            console.error(error)
+            toast.error("Failed to save address info")
+        } finally {
+            setLoading(false)
+        }
     }
 
     const handlePlaceOrder = async () => {
+        if (!savedAddressId) {
+            toast.error("Address not saved. Please go back and save address.")
+            return
+        }
+
         setLoading(true)
         try {
-            // Using backend sync via cart service if implemented, or mocking
-            // For Phase 3.3/4, we simulate "address id 1" or handle address creation.
-            // Assuming current address handling needs backend support for saving address first.
-            // For now, we'll pass a dummy address ID if backend requires it, or just create order.
-            // The backend CreateOrder schema expects shipping_address_id
-
-            // TODO: In a real app, we first POST /users/addresses to get an ID. 
-            // For now, we'll assume ID 1 exists or backend creates default.
-            // Actually, let's verify if we need to implement address saving.
-            // Looking at backend logs, user has addresses? Maybe not.
-            // Let's implement a quick mock address ID or update backend to accept address object.
-            // Simulating:
-            const order = await ordersService.createOrder(1) // 1 as partial mock. 
+            const order = await ordersService.createOrder(savedAddressId, paymentMethod)
 
             // Clear cart
             clearCart()
 
             toast.success("Order Placed Successfully!")
             router.push(`/orders/${order.id}`)
-        } catch (error) {
+        } catch (error: any) {
             console.error(error)
-            toast.error("Failed to place order")
+            toast.error(error.response?.data?.detail || "Failed to place order")
         } finally {
             setLoading(false)
         }
@@ -112,6 +126,14 @@ export default function CheckoutPage() {
                                                 required
                                                 value={address.city}
                                                 onChange={e => setAddress({ ...address, city: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>State</Label>
+                                            <Input
+                                                required
+                                                value={address.state}
+                                                onChange={e => setAddress({ ...address, state: e.target.value })}
                                             />
                                         </div>
                                         <div className="space-y-2">
