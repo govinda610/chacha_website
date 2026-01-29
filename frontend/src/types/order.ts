@@ -1,4 +1,3 @@
-import { Address } from "./auth"
 import { Product } from "./product"
 
 export type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled"

@@ -7,6 +7,9 @@ import enum
 class UserRole(str, enum.Enum):
     ADMIN = "admin"
     CUSTOMER = "customer"
+    WAREHOUSE_MANAGER = "warehouse_manager"
+    SALES_MANAGER = "sales_manager"
+    SUPPORT_EXECUTIVE = "support_executive"
 
 class Address(Base):
     __tablename__ = "addresses"

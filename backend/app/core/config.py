@@ -11,7 +11,8 @@ class Settings(BaseSettings):
     # - In development: Set via .env file in backend/ directory
     # - In production: Set via environment variable (e.g., PostgreSQL URL)
     # Default: sqlite:///./dentsupply.db (relative to working directory)
-    DATABASE_URL: str = "sqlite:///./dentsupply.db"
+    # Default: sqlite:///backend/dentsupply.db (absolute path)
+    DATABASE_URL: str = f"sqlite:///{Path(__file__).resolve().parent.parent.parent}/dentsupply.db"
     
     # SECURITY
     SECRET_KEY: str = "your-secret-key-here-for-local-dev"
