@@ -5,7 +5,7 @@ import { cartService } from "@/services/cart"
 import { productService } from "@/services/products"
 import type { Cart, CartItem } from "@/types/cart"
 import { toast } from "sonner"
-import { useAuth } from "@/context/auth-context" // Assuming we have this, or check if user logged in
+import { useAuth } from "@/context/auth-context"
 
 interface CartContextType {
     cart: Cart | null
@@ -24,8 +24,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 export function CartProvider({ children }: { children: ReactNode }) {
     const [cart, setCart] = useState<Cart | null>(null)
     const [isLoading, setIsLoading] = useState(false)
-    // We can use AuthContext to know when to fetch, but for now fetch on mount
-    // If api returns 401, cart stays null.
+    const { user } = useAuth()
 
     const refreshCart = async () => {
         const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null
@@ -33,11 +32,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         if (!token) {
             // Guest mode
             const localItems = JSON.parse(localStorage.getItem("guest_cart") || "[]")
-            // For guests, we need to populate product details if we want the UI to work the same
-            // But we can also just set a placeholder and let the checkout/cart page handle it
-            // Or better: fetch minimal details. For now, let's just use what's in local storage
-            const subtotal = localItems.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0)
-            const total_quantity = localItems.reduce((acc: number, item: any) => acc + item.quantity, 0)
+            const subtotal = localItems.reduce((acc: number, item: any) => acc + ((item.price || 0) * (item.quantity || 0)), 0)
+            const total_quantity = localItems.reduce((acc: number, item: any) => acc + (item.quantity || 0), 0)
 
             setCart({
                 items: localItems,
@@ -58,19 +54,44 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }
     }
 
+    // Sync guest cart to account after login
+    const syncCart = async () => {
+        const guestCart = JSON.parse(localStorage.getItem("guest_cart") || "[]")
+        if (guestCart.length === 0) return
+
+        setIsLoading(true)
+        try {
+            for (const item of guestCart) {
+                await cartService.addToCart({
+                    product_id: item.product_id,
+                    quantity: item.quantity,
+                    variant_id: item.variant_id
+                })
+            }
+            localStorage.removeItem("guest_cart")
+            await refreshCart()
+            toast.success("Guest items added to your account!")
+        } catch (err) {
+            console.error("Cart sync failed:", err)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
     useEffect(() => {
-        refreshCart()
-    }, [])
+        if (user) {
+            syncCart()
+        } else {
+            refreshCart()
+        }
+    }, [user])
 
     const addItem = async (productId: number, quantity: number, variantId?: number) => {
         setIsLoading(true)
         const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null
 
         if (!token) {
-            // Guest Add
             try {
-                // We need product details to store them for the guest cart UI
-                // This is a trade-off for not having a sophisticated guest-pre-fetcher
                 const product = await productService.getProductById(productId)
                 const variant = variantId ? product.variants?.find((v: any) => v.id === variantId) : null
                 const price = variant ? variant.price : product.selling_price
@@ -84,11 +105,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
                     localItems[existingIndex].quantity += quantity
                 } else {
                     localItems.push({
-                        id: Math.random(), // Temporary ID for guest items
+                        id: Math.random(),
                         product_id: productId,
                         variant_id: variantId,
                         quantity,
-                        price,
+                        price: price || 0,
                         product,
                         variant
                     })
@@ -112,12 +133,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             toast.success("Added to cart")
         } catch (err: any) {
             console.error(err)
-            if (err.response?.status === 401) {
-                toast.error("Please login to add items to cart")
-                window.location.href = "/login"
-            } else {
-                toast.error("Failed to add to cart")
-            }
+            toast.error("Failed to add to cart")
         } finally {
             setIsLoading(false)
         }
@@ -143,10 +159,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }
         try {
             await cartService.updateItem(itemId, quantity)
-            setCart(prev => prev ? {
-                ...prev,
-                items: prev.items.map(item => item.id === itemId ? { ...item, quantity } : item)
-            } : null)
             await refreshCart()
         } catch (err) {
             toast.error("Could not update quantity")
@@ -167,10 +179,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
         try {
             await cartService.removeItem(itemId)
-            setCart(prev => prev ? {
-                ...prev,
-                items: prev.items.filter(item => item.id !== itemId)
-            } : null)
             toast.success("Item removed")
             await refreshCart()
         } catch (err) {
@@ -182,18 +190,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
         const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null
         if (!token) {
             localStorage.removeItem("guest_cart")
-            refreshCart()
+            await refreshCart()
             return
         }
-        setCart(null)
-        await cartService.clearCart()
+        try {
+            await cartService.clearCart()
+            await refreshCart()
+        } catch (err) {
+            console.error("Clear cart failed:", err)
+        }
     }
 
     return (
         <CartContext.Provider value={{
             cart,
             items: cart?.items || [],
-            itemCount: cart?.items.reduce((acc, item) => acc + item.quantity, 0) || 0,
+            itemCount: cart?.items.reduce((acc, item) => acc + (item.quantity || 0), 0) || 0,
             isLoading,
             addItem,
             updateQuantity,

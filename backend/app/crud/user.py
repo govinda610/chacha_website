@@ -1,11 +1,12 @@
 from typing import Optional
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from app.core.security import get_password_hash, verify_password
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
 
 def get_by_email(db: Session, email: str) -> Optional[User]:
-    return db.query(User).filter(User.email == email).first()
+    return db.query(User).filter(func.lower(User.email) == func.lower(email)).first()
 
 def create(db: Session, obj_in: UserCreate) -> User:
     db_obj = User(
@@ -23,8 +24,10 @@ def create(db: Session, obj_in: UserCreate) -> User:
 def authenticate(db: Session, email: str, password: str) -> Optional[User]:
     user = get_by_email(db, email)
     if not user:
+        print(f"AUTH: User not found for email: {email}")
         return None
     if not verify_password(password, user.hashed_password):
+        print(f"AUTH: Password mismatch for email: {email}")
         return None
     return user
 

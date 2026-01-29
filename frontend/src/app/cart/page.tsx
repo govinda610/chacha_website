@@ -35,9 +35,12 @@ export default function CartPage() {
         )
     }
 
-    // Calculations
-    const subtotal = items.reduce((acc, item) => acc + (item.product.selling_price * item.quantity), 0)
-    const gst = subtotal * 0.18 // Assuming 18% GST for now (backend might calculate differently)
+    // Calculations with safety fallbacks to prevent NaN
+    const subtotal = items.reduce((acc, item) => {
+        const price = item.price || item.product?.selling_price || 0
+        return acc + (price * (item.quantity || 0))
+    }, 0)
+    const gst = subtotal * 0.18
     const total = subtotal + gst
 
     return (
@@ -48,64 +51,67 @@ export default function CartPage() {
                 {/* Cart Items */}
                 <div className="lg:col-span-2 space-y-4">
                     <div className="bg-white border rounded-xl overflow-hidden shadow-sm">
-                        {items.map((item, index) => (
-                            <div key={item.id}>
-                                <div className="p-4 flex gap-4 sm:gap-6">
-                                    {/* Image */}
-                                    <div className="h-24 w-24 bg-slate-100 rounded-lg flex-shrink-0 overflow-hidden border">
-                                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                                        <img
-                                            src={getMainImage(item.product?.images)}
-                                            alt={item.product.name}
-                                            className="w-full h-full object-cover mix-blend-multiply"
-                                        />
-                                    </div>
-
-                                    {/* Info */}
-                                    <div className="flex-1 flex flex-col justify-between">
-                                        <div>
-                                            <div className="flex justify-between items-start gap-2">
-                                                <h3 className="font-semibold text-lg line-clamp-1">{item.product.name}</h3>
-                                                <button
-                                                    className="text-muted-foreground hover:text-destructive transition-colors p-1"
-                                                    onClick={() => removeItem(item.id)}
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </button>
-                                            </div>
-                                            <p className="text-sm text-muted-foreground">
-                                                {item.variant ? item.variant.name : "Standard"}
-                                            </p>
+                        {items.map((item, index) => {
+                            const price = item.price || item.product?.selling_price || 0
+                            return (
+                                <div key={item.id}>
+                                    <div className="p-4 flex gap-4 sm:gap-6">
+                                        {/* Image */}
+                                        <div className="h-24 w-24 bg-slate-100 rounded-lg flex-shrink-0 overflow-hidden border">
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img
+                                                src={getMainImage(item.product?.images)}
+                                                alt={item.product?.name || "Product"}
+                                                className="w-full h-full object-cover mix-blend-multiply"
+                                            />
                                         </div>
 
-                                        <div className="flex items-center justify-between mt-2">
-                                            <div className="flex items-center border rounded-lg h-8">
-                                                <button
-                                                    className="px-2 h-full hover:bg-muted rounded-l-lg disabled:opacity-50"
-                                                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                                    disabled={isLoading}
-                                                >
-                                                    <Minus className="h-3 w-3" />
-                                                </button>
-                                                <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
-                                                <button
-                                                    className="px-2 h-full hover:bg-muted rounded-r-lg disabled:opacity-50"
-                                                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                                    disabled={isLoading}
-                                                >
-                                                    <Plus className="h-3 w-3" />
-                                                </button>
+                                        {/* Info */}
+                                        <div className="flex-1 flex flex-col justify-between">
+                                            <div>
+                                                <div className="flex justify-between items-start gap-2">
+                                                    <h3 className="font-semibold text-lg line-clamp-1">{item.product?.name || "Product"}</h3>
+                                                    <button
+                                                        className="text-muted-foreground hover:text-destructive transition-colors p-1"
+                                                        onClick={() => removeItem(item.id)}
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </button>
+                                                </div>
+                                                <p className="text-sm text-muted-foreground">
+                                                    {item.variant ? item.variant.name : "Standard"}
+                                                </p>
                                             </div>
-                                            <div className="text-right">
-                                                <p className="font-bold">₹{(item.product.selling_price * item.quantity).toLocaleString()}</p>
-                                                <p className="text-xs text-muted-foreground">₹{item.product.selling_price} each</p>
+
+                                            <div className="flex items-center justify-between mt-2">
+                                                <div className="flex items-center border rounded-lg h-8">
+                                                    <button
+                                                        className="px-2 h-full hover:bg-muted rounded-l-lg disabled:opacity-50"
+                                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                        disabled={isLoading}
+                                                    >
+                                                        <Minus className="h-3 w-3" />
+                                                    </button>
+                                                    <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
+                                                    <button
+                                                        className="px-2 h-full hover:bg-muted rounded-r-lg disabled:opacity-50"
+                                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                        disabled={isLoading}
+                                                    >
+                                                        <Plus className="h-3 w-3" />
+                                                    </button>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="font-bold">₹{(price * item.quantity).toLocaleString()}</p>
+                                                    <p className="text-xs text-muted-foreground">₹{price} each</p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
+                                    {index < items.length - 1 && <Separator />}
                                 </div>
-                                {index < items.length - 1 && <Separator />}
-                            </div>
-                        ))}
+                            )
+                        })}
                     </div>
                 </div>
 

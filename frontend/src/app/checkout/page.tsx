@@ -44,7 +44,7 @@ export default function CheckoutPage() {
         return <div className="p-8 text-center bg-muted/5">Your cart is empty</div>
     }
 
-    const subtotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0)
+    const subtotal = items.reduce((acc, item) => acc + ((item.price || 0) * (item.quantity || 0)), 0)
     const shipping = subtotal > 5000 ? 0 : 150
     const gst = (subtotal + shipping) * 0.18
     const total = subtotal + shipping + gst
@@ -88,9 +88,18 @@ export default function CheckoutPage() {
 
         setLoading(true)
         try {
+            // Always prepare items payload from what is visible in the cart
+            const itemsPayload = items.map(item => ({
+                product_id: item.product_id,
+                variant_id: item.variant_id,
+                quantity: item.quantity,
+                unit_price: item.price || 0
+            }))
+
             const orderPayload: any = {
                 address_id: savedAddressId,
                 payment_method: paymentMethod,
+                items: itemsPayload, // Always send items to ensure backend has latest data
                 notes: ""
             }
 
@@ -98,12 +107,6 @@ export default function CheckoutPage() {
                 orderPayload.guest_name = guestInfo.name
                 orderPayload.guest_email = guestInfo.email
                 orderPayload.guest_phone = guestInfo.phone
-                orderPayload.items = items.map(item => ({
-                    product_id: item.product_id,
-                    variant_id: item.variant_id,
-                    quantity: item.quantity,
-                    unit_price: item.price
-                }))
             }
 
             const order = await ordersService.createOrder(orderPayload)
@@ -133,7 +136,7 @@ export default function CheckoutPage() {
                                     order_id: order.id
                                 })
 
-                                clearCart()
+                                await clearCart()
                                 toast.success("Payment successful! Order confirmed.")
                                 router.push(`/orders/${order.id}?status=success`)
                             } catch (err) {
@@ -169,7 +172,7 @@ export default function CheckoutPage() {
             }
 
             // COD flow
-            clearCart()
+            await clearCart()
             toast.success("Order Placed Successfully!")
             router.push(`/orders/${order.id}`)
         } catch (error: any) {
@@ -193,7 +196,7 @@ export default function CheckoutPage() {
                         <p className="text-blue-800 font-medium">Checking out as a guest</p>
                         <p className="text-blue-600 text-sm">Already have an account? Log in for a faster experience.</p>
                     </div>
-                    <Button variant="outline" size="sm" onClick={() => router.push("/login")}>Login</Button>
+                    <Button variant="outline" size="sm" onClick={() => router.push(`/login?returnUrl=/checkout`)}>Login</Button>
                 </div>
             )}
 
@@ -332,8 +335,8 @@ export default function CheckoutPage() {
                         <div className="space-y-3">
                             {items.map((item, idx) => (
                                 <div key={item.id || idx} className="flex justify-between text-sm">
-                                    <span className="truncate max-w-[150px]">{item.quantity}x {item.product.name}</span>
-                                    <span>₹{(item.price * item.quantity).toLocaleString()}</span>
+                                    <span className="truncate max-w-[150px]">{item.quantity}x {item.product?.name || 'Product'}</span>
+                                    <span>₹{((item.price || 0) * (item.quantity || 0)).toLocaleString()}</span>
                                 </div>
                             ))}
                         </div>

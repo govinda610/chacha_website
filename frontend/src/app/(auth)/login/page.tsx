@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Loader2 } from "lucide-react"
+import { Loader2, AlertCircle } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/context/auth-context"
 import { toast } from "sonner"
+import { Suspense } from "react"
 
 const loginSchema = z.object({
     email: z.string().email({
@@ -33,16 +34,12 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>
 
-import { Suspense } from "react"
-
-// ... imports (kept same, handled by tool context usually, but here I need to be careful with imports if I replace whole file)
-// Actually I will replace the main function and split it.
-
 function LoginForm() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const { login } = useAuth()
     const [isLoading, setIsLoading] = useState(false)
+    const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
     const returnUrl = searchParams.get("returnUrl") || "/"
 
@@ -56,13 +53,17 @@ function LoginForm() {
 
     async function onSubmit(data: LoginFormValues) {
         setIsLoading(true)
+        setErrorMsg(null)
         try {
             await login({ email: data.email, password: data.password })
             toast.success("Logged in successfully")
             router.push(returnUrl)
-        } catch (error) {
+        } catch (error: any) {
             console.error(error)
-            toast.error("Invalid email or password")
+            const detail = error.response?.data?.detail || "Invalid email or password"
+            setErrorMsg(detail)
+            // toast for quick feedback, but errorMsg for staying power
+            toast.error(detail)
         } finally {
             setIsLoading(false)
         }
@@ -88,6 +89,18 @@ function LoginForm() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-4">
+                        {errorMsg && (
+                            <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm flex items-start gap-2">
+                                <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                                <div>
+                                    <p className="font-medium">{errorMsg}</p>
+                                    <p className="mt-1 text-xs opacity-90">
+                                        If you don&apos;t have an account, please{" "}
+                                        <Link href="/register" className="font-bold underline">Sign Up</Link> to create one.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                                 <FormField
