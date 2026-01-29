@@ -3,7 +3,7 @@ export interface User {
     email: string
     full_name?: string
     phone?: string
-    role: "admin" | "customer"
+    role: "admin" | "customer" | "warehouse_manager" | "sales_manager" | "support_executive"
     is_active: boolean
     gst_number?: string
     dental_license?: string

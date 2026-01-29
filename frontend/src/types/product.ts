@@ -1,16 +1,24 @@
 export interface ProductImage {
-    image_url: string
-    image_type: string
-    display_order: number
+    id?: number
+    image_url?: string
+    image_type?: string
+    display_order?: number
+    main?: string // Add this to match usage, or fix usage
+}
+
+// Better approach: Define the images object structure if it's not an array of ProductImage
+export interface ProductImages {
+    main?: string
+    gallery?: string[]
 }
 
 export interface ProductVariant {
     id: number
     name: string
     sku: string
-    price: number
+    price_adjustment: number // Added
     stock_quantity: number
-    specifications?: Record<string, any>
+    specifications?: Record<string, string | number | boolean>
 }
 
 export interface Category {
@@ -34,10 +42,13 @@ export interface Product {
     id: number
     name: string
     slug: string
+    sku?: string
     description?: string
-    specifications?: Record<string, any>
+    clinical_benefits?: string
+    specifications?: Record<string, string | number | boolean>
     base_price: number
     selling_price: number
+    stock_quantity: number // Added
     has_variants?: boolean
     is_active: boolean
     brand_id?: number
@@ -46,7 +57,7 @@ export interface Product {
     // Relations
     brand?: Brand
     category?: Category
-    images?: ProductImage[]
+    images?: ProductImages // Changed from ProductImage[] to match usage: product.images.main
     variants?: ProductVariant[]
 }
 
