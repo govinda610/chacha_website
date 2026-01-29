@@ -26,7 +26,7 @@ export function MobileNav() {
         },
         {
             label: "Account",
-            href: "/auth/login", // Will switch to /account if logged in
+            href: "/login", // Will switch to /account if logged in
             icon: User
         }
     ]

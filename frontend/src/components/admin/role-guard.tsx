@@ -25,7 +25,7 @@ export function RoleGuard({ children, allowedRoles = [UserRole.ADMIN] }: RoleGua
     useEffect(() => {
         if (!isLoading) {
             if (!user) {
-                router.push("/auth/login")
+                router.push("/login")
             } else if (allowedRoles && !allowedRoles.includes(user.role as UserRole)) {
                 router.push("/") // Or unauthorized page
             }

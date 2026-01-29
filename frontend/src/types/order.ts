@@ -38,4 +38,10 @@ export interface Order {
         state: string
         pincode: string
     }
+    user?: {
+        id: number
+        full_name: string
+        email: string
+        phone: string
+    }
 }

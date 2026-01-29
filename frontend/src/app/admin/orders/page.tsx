@@ -1,9 +1,10 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
     Table,
     TableBody,
@@ -20,24 +21,33 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, Eye } from "lucide-react"
+import { Loader2, Eye, Search } from "lucide-react"
 import { toast } from "sonner"
-import { OrderStatus } from "@/types/order"
+import { adminService } from "@/services/admin"
+import { Order, OrderStatus } from "@/types/order"
+// import { debounce } from "lodash" 
 
-interface AdminOrder {
-    id: number
-    order_number: string
-    total_amount: number
-    status: OrderStatus
-    payment_status: string
-    user_id: number
-    created_at?: string // API might need to return this for sorting/display
+
+// Simple debounce function if lodash is not available, but user likely has it or can install. 
+// Using a custom hook or basic timeout for now to avoid dependency issues if not installed.
+function useDebounce<T>(value: T, delay: number): T {
+    const [debouncedValue, setDebouncedValue] = useState<T>(value);
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value);
+        }, delay);
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [value, delay]);
+    return debouncedValue;
 }
 
 export default function AdminOrdersPage() {
-    const [orders, setOrders] = useState<AdminOrder[]>([])
+    const [orders, setOrders] = useState<Order[]>([])
     const [loading, setLoading] = useState(true)
     const [total, setTotal] = useState(0)
+
     const searchParams = useSearchParams()
     const router = useRouter()
     const pathname = usePathname()
@@ -45,43 +55,57 @@ export default function AdminOrdersPage() {
     const page = Number(searchParams.get("page")) || 1
     const limit = 20
     const statusFilter = searchParams.get("status") || "all"
+    const searchParam = searchParams.get("search") || ""
+
+    // Local state for search input to allow typing
+    const [searchTerm, setSearchTerm] = useState(searchParam)
+    const debouncedSearch = useDebounce(searchTerm, 500)
 
     const fetchOrders = async () => {
         setLoading(true)
         try {
-            const token = localStorage.getItem("token")
-            const params = new URLSearchParams({
-                skip: ((page - 1) * limit).toString(),
-                limit: limit.toString(),
-            })
+            const params: any = {
+                skip: (page - 1) * limit,
+                limit: limit,
+            }
             if (statusFilter !== "all") {
-                params.append("status", statusFilter)
+                params.status = statusFilter
+            }
+            // Backend needs to support search by order number or user email
+            if (debouncedSearch) {
+                params.search = debouncedSearch
             }
 
-            const response = await fetch(`http://localhost:8000/api/v1/admin/orders?${params}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
-
-            if (response.ok) {
-                const data = await response.json()
-                setOrders(data.orders)
-                setTotal(data.total)
-            } else {
-                toast.error("Failed to fetch orders")
-            }
+            const data = await adminService.getOrders(params)
+            setOrders(data.orders)
+            setTotal(data.total)
         } catch (error) {
             console.error("Error fetching orders:", error)
+            toast.error("Failed to fetch orders")
         } finally {
             setLoading(false)
         }
     }
 
+    // Effect for fetching when dependencies change
     useEffect(() => {
         fetchOrders()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page, statusFilter])
+    }, [page, statusFilter, debouncedSearch])
+
+    // Update URL when search changes (after debounce)
+    useEffect(() => {
+        const params = new URLSearchParams(searchParams)
+        if (debouncedSearch) {
+            params.set("search", debouncedSearch)
+        } else {
+            params.delete("search")
+        }
+        // Only push if different to avoid redundant history
+        if (params.toString() !== searchParams.toString()) {
+            router.replace(`${pathname}?${params.toString()}`)
+        }
+    }, [debouncedSearch, pathname, router, searchParams])
 
     const handleStatusChange = (value: string) => {
         const params = new URLSearchParams(searchParams)
@@ -108,9 +132,6 @@ export default function AdminOrdersPage() {
         }).format(amount)
     }
 
-    // getStatusColor removed as it was unused
-
-
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -122,20 +143,31 @@ export default function AdminOrdersPage() {
                 </div>
             </div>
 
-            <div className="flex items-center gap-2">
-                <Select value={statusFilter} onValueChange={handleStatusChange}>
-                    <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Filter by status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">All Statuses</SelectItem>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="processing">Processing</SelectItem>
-                        <SelectItem value="shipped">Shipped</SelectItem>
-                        <SelectItem value="delivered">Delivered</SelectItem>
-                        <SelectItem value="cancelled">Cancelled</SelectItem>
-                    </SelectContent>
-                </Select>
+            <div className="flex flex-col sm:flex-row items-center gap-4 justify-between">
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <div className="relative flex-1 sm:w-[300px]">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder="Search orders..."
+                            className="pl-8"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <Select value={statusFilter} onValueChange={handleStatusChange}>
+                        <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Filter by status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Statuses</SelectItem>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="processing">Processing</SelectItem>
+                            <SelectItem value="shipped">Shipped</SelectItem>
+                            <SelectItem value="delivered">Delivered</SelectItem>
+                            <SelectItem value="cancelled">Cancelled</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
 
             <div className="rounded-md border">
@@ -143,7 +175,8 @@ export default function AdminOrdersPage() {
                     <TableHeader>
                         <TableRow>
                             <TableHead>Order #</TableHead>
-                            <TableHead>Customer ID</TableHead>
+                            <TableHead>Customer</TableHead>
+                            <TableHead>Date</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead>Payment</TableHead>
                             <TableHead className="text-right">Total</TableHead>
@@ -153,13 +186,13 @@ export default function AdminOrdersPage() {
                     <TableBody>
                         {loading ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center">
+                                <TableCell colSpan={7} className="h-24 text-center">
                                     <Loader2 className="mx-auto h-6 w-6 animate-spin" />
                                 </TableCell>
                             </TableRow>
                         ) : orders.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center">
+                                <TableCell colSpan={7} className="h-24 text-center">
                                     No orders found.
                                 </TableCell>
                             </TableRow>
@@ -167,7 +200,15 @@ export default function AdminOrdersPage() {
                             orders.map((order) => (
                                 <TableRow key={order.id}>
                                     <TableCell className="font-medium">{order.order_number}</TableCell>
-                                    <TableCell>#{order.user_id}</TableCell>
+                                    <TableCell>
+                                        <div className="flex flex-col">
+                                            <span className="font-medium">{order.user?.full_name || `User #${order.user_id}`}</span>
+                                            <span className="text-xs text-muted-foreground">{order.user?.email}</span>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="text-muted-foreground text-sm">
+                                        {new Date(order.created_at).toLocaleDateString()}
+                                    </TableCell>
                                     <TableCell>
                                         <Badge variant="outline" className="capitalize">
                                             {order.status}

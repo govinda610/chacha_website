@@ -14,7 +14,7 @@ class UserRole(str, enum.Enum):
 class Address(Base):
     __tablename__ = "addresses"
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     
     label = Column(String) # Home, Office, Clinic
     full_address = Column(String, nullable=False)
@@ -62,6 +62,7 @@ class User(Base):
     tier = Column(String, default="Standard")
     credit_limit = Column(Float, default=0.0)
     credit_used = Column(Float, default=0.0)
+    credit_period_days = Column(Integer, default=30)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

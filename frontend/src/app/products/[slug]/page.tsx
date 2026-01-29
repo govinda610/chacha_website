@@ -80,7 +80,7 @@ export default function ProductDetailPage() {
         }
     }
 
-    const currentPrice = selectedVariant ? selectedVariant.price_adjustment + product.selling_price : product.selling_price
+    const currentPrice = selectedVariant ? selectedVariant.price : product.selling_price
     const isOutOfStock = product.stock_quantity <= 0
 
     return (

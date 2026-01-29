@@ -232,12 +232,14 @@ function ProductsContent() {
                 </div>
 
                 {/* Desktop Sidebar */}
-                <div className="hidden md:block w-64 shrink-0 space-y-8">
-                    <div className="sticky top-24 space-y-6">
-                        <div>
-                            <h2 className="text-lg font-bold">Filters</h2>
+                <div className="hidden md:block w-64 shrink-0">
+                    <div className="sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200 hover:scrollbar-thumb-gray-300">
+                        <div className="space-y-6 pb-6">
+                            <div>
+                                <h2 className="text-lg font-bold">Filters</h2>
+                            </div>
+                            <FilterContent />
                         </div>
-                        <FilterContent />
                     </div>
                 </div>
 

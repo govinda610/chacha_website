@@ -58,7 +58,7 @@ export default function HomePage() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="/auth/register">
+              <Link href="/register">
                 <Button size="lg" variant="outline" className="bg-transparent text-white border-white/30 hover:bg-white/10 font-medium rounded-xl h-12">
                   Create Professional Account
                 </Button>

@@ -38,6 +38,11 @@ export const productService = {
         return data
     },
 
+    async getProductById(id: number): Promise<Product> {
+        const { data } = await api.get<Product>(`/products/id/${id}`)
+        return data
+    },
+
     async getCategories(): Promise<Category[]> {
         const { data } = await api.get<Category[]>("/categories/")
         return data

@@ -16,9 +16,11 @@ export interface ProductVariant {
     id: number
     name: string
     sku: string
-    price_adjustment: number // Added
+    price: number
     stock_quantity: number
     specifications?: Record<string, string | number | boolean>
+    lot_number?: string
+    expiry_date?: string // ISO date string
 }
 
 export interface Category {

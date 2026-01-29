@@ -1,7 +1,7 @@
 """
 Payment endpoints for Razorpay integration.
 """
-from typing import Any
+from typing import Any, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
@@ -41,17 +41,20 @@ class WebhookEvent(BaseModel):
 def create_payment_order(
     *,
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Optional[User] = Depends(deps.get_current_active_user_optional),
     request: CreatePaymentOrderRequest
 ) -> Any:
     """
     Create a Razorpay order for payment.
     """
     # Get the order
-    order = db.query(Order).filter(
-        Order.id == request.order_id,
-        Order.user_id == current_user.id
-    ).first()
+    query = db.query(Order).filter(Order.id == request.order_id)
+    if current_user:
+        query = query.filter(Order.user_id == current_user.id)
+    else:
+        query = query.filter(Order.user_id == None)
+    
+    order = query.first()
     
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
@@ -82,16 +85,19 @@ def create_payment_order(
 def verify_payment(
     *,
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Optional[User] = Depends(deps.get_current_active_user_optional),
     request: VerifyPaymentRequest
 ) -> Any:
     """
     Verify Razorpay payment signature and update order status.
     """
-    order = db.query(Order).filter(
-        Order.id == request.order_id,
-        Order.user_id == current_user.id
-    ).first()
+    query = db.query(Order).filter(Order.id == request.order_id)
+    if current_user:
+        query = query.filter(Order.user_id == current_user.id)
+    else:
+        query = query.filter(Order.user_id == None)
+    
+    order = query.first()
     
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")

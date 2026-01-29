@@ -20,7 +20,7 @@ class AddressUpdate(AddressBase):
 
 class AddressInDBBase(AddressBase):
     id: int
-    user_id: int
+    user_id: Optional[int] = None
 
     class Config:
         from_attributes = True

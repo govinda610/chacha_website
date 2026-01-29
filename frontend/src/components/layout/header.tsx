@@ -75,7 +75,7 @@ export function Header() {
                             </Button>
                         </div>
                     ) : (
-                        <Link href="/auth/login">
+                        <Link href="/login">
                             <Button variant="ghost" className="hidden md:flex gap-2 font-medium hover:bg-muted/50">
                                 <User className="h-5 w-5" />
                                 <span>Login</span>

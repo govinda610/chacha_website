@@ -24,14 +24,17 @@ class OrderBase(BaseModel):
     address_id: int
     notes: Optional[str] = None
     payment_method: str = "cod"
+    guest_email: Optional[str] = None
+    guest_phone: Optional[str] = None
+    guest_name: Optional[str] = None
 
 class OrderCreate(OrderBase):
-    pass
+    items: Optional[List[OrderItemBase]] = None
 
 class Order(OrderBase):
     id: int
     order_number: str
-    user_id: int
+    user_id: Optional[int] = None
     status: str
     payment_status: str
     subtotal: float

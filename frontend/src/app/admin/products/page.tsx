@@ -20,10 +20,20 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, MoreHorizontal, Search, Plus } from "lucide-react"
-import { BulkActions } from "@/components/admin/products/bulk-actions"
+import { Loader2, MoreHorizontal, Search, Plus, Trash2 } from "lucide-react"
+// import { BulkActions } from "@/components/admin/products/bulk-actions" // Temporarily disabled or verify existence
 import { toast } from "sonner"
+import { adminService } from "@/services/admin"
+import { ProductForm } from "@/components/admin/products/product-form"
 
 interface Product {
     id: number
@@ -32,19 +42,20 @@ interface Product {
     selling_price: number
     base_price: number
     is_active: boolean
-    category_id?: number
-    stock_quantity?: number // Might come from variant in future, mocking here or assuming flattened
+    stock_quantity?: number
 }
 
 export default function AdminProductsPage() {
     const [products, setProducts] = useState<Product[]>([])
     const [loading, setLoading] = useState(true)
     const [total, setTotal] = useState(0)
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(undefined)
+
     const searchParams = useSearchParams()
     const router = useRouter()
     const pathname = usePathname()
 
-    // Query params
     const page = Number(searchParams.get("page")) || 1
     const limit = 20
     const search = searchParams.get("search") || ""
@@ -52,28 +63,17 @@ export default function AdminProductsPage() {
     const fetchProducts = async () => {
         setLoading(true)
         try {
-            const token = localStorage.getItem("token")
-            const params = new URLSearchParams({
-                skip: ((page - 1) * limit).toString(),
-                limit: limit.toString(),
-            })
-            if (search) params.append("search", search)
-
-            const response = await fetch(`http://localhost:8000/api/v1/admin/products?${params}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
-
-            if (response.ok) {
-                const data = await response.json()
-                setProducts(data.products)
-                setTotal(data.total)
-            } else {
-                toast.error("Failed to fetch products")
+            const params = {
+                skip: (page - 1) * limit,
+                limit: limit,
+                search: search || undefined
             }
+            const data = await adminService.getProducts(params)
+            setProducts(data.products)
+            setTotal(data.total)
         } catch (error) {
             console.error("Error fetching products:", error)
+            toast.error("Failed to fetch products")
         } finally {
             setLoading(false)
         }
@@ -81,6 +81,7 @@ export default function AdminProductsPage() {
 
     useEffect(() => {
         fetchProducts()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [page, search])
 
     const handleSearch = (term: string) => {
@@ -90,7 +91,7 @@ export default function AdminProductsPage() {
         } else {
             params.delete("search")
         }
-        params.set("page", "1") // Reset to page 1
+        params.set("page", "1")
         router.replace(`${pathname}?${params.toString()}`)
     }
 
@@ -100,29 +101,42 @@ export default function AdminProductsPage() {
         router.push(`${pathname}?${params.toString()}`)
     }
 
-    // Quick Update Handler
-    const handleQuickUpdate = async (id: number, field: string, value: string | number) => {
-        // Optimistic update
-        setProducts(prev => prev.map(p => p.id === id ? { ...p, [field]: value } : p))
-
+    const handleCreateUpdate = async (data: any) => {
         try {
-            const token = localStorage.getItem("token")
-            const response = await fetch(`http://localhost:8000/api/v1/admin/products/${id}`, {
-                method: "PUT",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ [field]: value })
-            })
-
-            if (!response.ok) {
-                throw new Error("Update failed")
+            if (selectedProduct) {
+                await adminService.updateProduct(selectedProduct.id, data)
+                toast.success("Product updated")
+            } else {
+                await adminService.createProduct(data)
+                toast.success("Product created")
             }
-            toast.success("Updated")
+            setIsDialogOpen(false)
+            fetchProducts()
         } catch (error) {
-            toast.error("Failed to update product")
-            fetchProducts() // Revert
+            toast.error("Operation failed")
+            console.error(error)
+        }
+    }
+
+    const handleDelete = async (id: number) => {
+        if (!confirm("Are you sure you want to delete this product?")) return
+        try {
+            await adminService.deleteProduct(id)
+            toast.success("Product deleted")
+            fetchProducts()
+        } catch (error) {
+            toast.error("Failed to delete product")
+        }
+    }
+
+    const openEditDialog = async (product: Product) => {
+        // Fetch full details including variants
+        try {
+            const fullProduct = await adminService.getProduct(product.id)
+            setSelectedProduct(fullProduct)
+            setIsDialogOpen(true)
+        } catch (error) {
+            toast.error("Failed to load product details")
         }
     }
 
@@ -136,11 +150,30 @@ export default function AdminProductsPage() {
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <BulkActions />
-                    <Button>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Product
-                    </Button>
+                    {/* <BulkActions /> */}
+                    <Dialog open={isDialogOpen} onOpenChange={(open) => {
+                        setIsDialogOpen(open)
+                        if (!open) setSelectedProduct(undefined)
+                    }}>
+                        <DialogTrigger asChild>
+                            <Button>
+                                <Plus className="mr-2 h-4 w-4" />
+                                Add Product
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                            <DialogHeader>
+                                <DialogTitle>{selectedProduct ? "Edit Product" : "Add New Product"}</DialogTitle>
+                                <DialogDescription>
+                                    Fill in the details below.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <ProductForm
+                                initialData={selectedProduct}
+                                onSubmit={handleCreateUpdate}
+                            />
+                        </DialogContent>
+                    </Dialog>
                 </div>
             </div>
 
@@ -165,7 +198,7 @@ export default function AdminProductsPage() {
                     <TableHeader>
                         <TableRow>
                             <TableHead>Name</TableHead>
-                            <TableHead>SKU</TableHead>
+                            <TableHead>Slug</TableHead>
                             <TableHead>Price</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead className="w-[100px]">Actions</TableHead>
@@ -189,14 +222,7 @@ export default function AdminProductsPage() {
                                 <TableRow key={product.id}>
                                     <TableCell className="font-medium">{product.name}</TableCell>
                                     <TableCell>{product.slug}</TableCell>
-                                    <TableCell>
-                                        <Input
-                                            className="h-8 w-24"
-                                            type="number"
-                                            defaultValue={product.selling_price}
-                                            onBlur={(e) => handleQuickUpdate(product.id, 'selling_price', Number(e.target.value))}
-                                        />
-                                    </TableCell>
+                                    <TableCell>₹{product.selling_price}</TableCell>
                                     <TableCell>
                                         <Badge variant={product.is_active ? "default" : "destructive"}>
                                             {product.is_active ? "Active" : "Inactive"}
@@ -213,11 +239,21 @@ export default function AdminProductsPage() {
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                                 <DropdownMenuItem onClick={() => navigator.clipboard.writeText(product.slug)}>
-                                                    Copy SKU
+                                                    Copy Slug
                                                 </DropdownMenuItem>
                                                 <DropdownMenuSeparator />
-                                                <DropdownMenuItem>Edit details</DropdownMenuItem>
-                                                <DropdownMenuItem className="text-destructive">Archive product</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => openEditDialog(product)}>
+                                                    Edit details
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    className="text-destructive"
+                                                    onClick={() => handleDelete(product.id)}
+                                                >
+                                                    <div className="flex items-center">
+                                                        <Trash2 className="mr-2 h-4 w-4" />
+                                                        Delete
+                                                    </div>
+                                                </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>
@@ -228,7 +264,6 @@ export default function AdminProductsPage() {
                 </Table>
             </div>
 
-            {/* Pagination Controls */}
             <div className="flex items-center justify-end space-x-2 py-4">
                 <Button
                     variant="outline"
@@ -239,7 +274,7 @@ export default function AdminProductsPage() {
                     Previous
                 </Button>
                 <div className="text-sm text-muted-foreground">
-                    Page {page} of {Math.ceil(total / limit)}
+                    Page {page} of {Math.ceil(total / limit) || 1}
                 </div>
                 <Button
                     variant="outline"

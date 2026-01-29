@@ -8,6 +8,7 @@ export interface CartItem {
     variant_id?: number
     variant?: ProductVariant
     quantity: number
+    price: number
 }
 
 export interface Cart {

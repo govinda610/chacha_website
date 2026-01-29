@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
             await authService.register(data)
             toast.success("Account created! Please login.")
-            router.push("/auth/login")
+            router.push("/login")
         } catch (error: any) {
             console.error("Registration error", error)
             // Handle Pydantic validation errors (422) which return array of error objects
@@ -88,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const logout = () => {
         localStorage.removeItem("token")
         setUser(null)
-        router.push("/auth/login")
+        router.push("/login")
         toast.info("Logged out successfully")
     }
 

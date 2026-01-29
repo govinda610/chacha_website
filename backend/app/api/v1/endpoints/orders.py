@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.api import deps
@@ -12,13 +12,13 @@ router = APIRouter()
 def checkout(
     *,
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Optional[User] = Depends(deps.get_current_active_user_optional),
     order_in: OrderCreate
 ) -> Any:
     """
-    Create a new order from cart.
+    Create a new order.
     """
-    return crud_order.create_order(db, user_id=current_user.id, order_in=order_in)
+    return crud_order.create_order(db, user_id=current_user.id if current_user else None, order_in=order_in)
 
 @router.get("/", response_model=List[Order])
 def read_orders(
@@ -34,12 +34,12 @@ def read_orders(
 def read_order(
     order_id: int,
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Optional[User] = Depends(deps.get_current_active_user_optional),
 ) -> Any:
     """
     Get specific order details.
     """
-    order = crud_order.get_order(db, user_id=current_user.id, order_id=order_id)
+    order = crud_order.get_order(db, order_id=order_id, user_id=current_user.id if current_user else None)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
     return order

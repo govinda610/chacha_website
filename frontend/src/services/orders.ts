@@ -12,11 +12,16 @@ export const ordersService = {
         return data
     },
 
-    async createOrder(addressId: number, paymentMethod: string = "cod"): Promise<Order> {
-        const { data } = await api.post<Order>("/orders/", {
-            address_id: addressId,
-            payment_method: paymentMethod
-        })
+    async createOrder(payload: any): Promise<Order> {
+        // If payload is already an object with the right structure, use it
+        // Otherwise wrap it (for backward compatibility if needed)
+        const body = (payload && typeof payload === 'object' && payload.address_id)
+            ? payload
+            : {
+                address_id: payload, // assume first arg was addressId
+                payment_method: "cod"
+            }
+        const { data } = await api.post<Order>("/orders/", body)
         return data
     },
 

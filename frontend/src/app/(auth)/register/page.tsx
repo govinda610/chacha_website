@@ -63,7 +63,7 @@ export default function RegisterPage() {
             const { confirmPassword, ...registerData } = data
             await register(registerData)
             toast.success("Registration successful! Please login.")
-            router.push("/auth/login")
+            router.push("/login")
         } catch (error) {
             console.error(error)
             // Toast error is handled in auth-context
@@ -209,7 +209,7 @@ export default function RegisterPage() {
                         <div>
                             Already have an account?{" "}
                             <Link
-                                href="/auth/login"
+                                href="/login"
                                 className="underline underline-offset-4 hover:text-primary"
                             >
                                 Login

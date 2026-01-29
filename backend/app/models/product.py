@@ -63,6 +63,10 @@ class ProductVariant(Base):
     price = Column(Float, nullable=False)
     stock_quantity = Column(Integer, default=0)
     
+    # Batch tracking (Simplified for MVP - assumes FIFO or single batch per variant for now)
+    lot_number = Column(String, nullable=True)
+    expiry_date = Column(DateTime(timezone=True), nullable=True)
+    
     specifications = Column(JSON, nullable=True) # e.g., {"diameter": "4.2mm", "length": "8.0mm"}
     
     product = relationship("Product", back_populates="variants")

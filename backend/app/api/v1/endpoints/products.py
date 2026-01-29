@@ -45,6 +45,20 @@ def read_brands(
     """
     return crud_product.get_brands(db)
 
+@router.get("/id/{product_id}", response_model=Product)
+def read_product_by_id(
+    *,
+    db: Session = Depends(deps.get_db),
+    product_id: int,
+) -> Any:
+    """
+    Get product by ID.
+    """
+    product = crud_product.get_product(db, product_id=product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return product
+
 @router.get("/{slug}", response_model=Product)
 def read_product(
     *,

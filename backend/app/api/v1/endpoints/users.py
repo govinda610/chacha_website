@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -13,13 +13,15 @@ router = APIRouter()
 @router.get("/addresses", response_model=List[AddressSchema])
 def read_user_addresses(
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Optional[User] = Depends(deps.get_current_active_user_optional),
     skip: int = 0,
     limit: int = 100,
 ) -> Any:
     """
     Retrieve current user's addresses.
     """
+    if not current_user:
+        return []
     return db.query(Address).filter(Address.user_id == current_user.id).offset(skip).limit(limit).all()
 
 @router.post("/addresses", response_model=AddressSchema)
@@ -27,18 +29,17 @@ def create_user_address(
     *,
     db: Session = Depends(deps.get_db),
     address_in: AddressCreate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: Optional[User] = Depends(deps.get_current_active_user_optional),
 ) -> Any:
     """
-    Create new address for current user.
+    Create new address.
     """
-    # If set as default, unset others // simplified logic for now
-    if address_in.is_default:
+    if current_user and address_in.is_default:
         db.query(Address).filter(Address.user_id == current_user.id).update({"is_default": False})
     
     db_obj = Address(
         **address_in.model_dump(),
-        user_id=current_user.id
+        user_id=current_user.id if current_user else None
     )
     db.add(db_obj)
     db.commit()

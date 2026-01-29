@@ -24,12 +24,16 @@ class Order(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     order_number = Column(String, unique=True, index=True, nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     address_id = Column(Integer, ForeignKey("addresses.id"))
     
     status = Column(String, default=OrderStatus.PENDING)
     payment_status = Column(String, default=PaymentStatus.PENDING)
     payment_method = Column(String) # razorpay, credit, cod
+    
+    guest_email = Column(String, nullable=True)
+    guest_phone = Column(String, nullable=True)
+    guest_name = Column(String, nullable=True)
     
     razorpay_order_id = Column(String, nullable=True)
     razorpay_payment_id = Column(String, nullable=True)
