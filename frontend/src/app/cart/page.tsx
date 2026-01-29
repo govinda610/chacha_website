@@ -6,6 +6,7 @@ import { Minus, Plus, Trash2, ArrowRight, ShoppingBag } from "lucide-react"
 import Link from "next/link"
 import { Separator } from "@/components/ui/separator"
 import { useRouter } from "next/navigation"
+import { cn, getMainImage } from "@/lib/utils"
 
 export default function CartPage() {
     const { cart, items, updateQuantity, removeItem, isLoading } = useCart()
@@ -54,7 +55,7 @@ export default function CartPage() {
                                     <div className="h-24 w-24 bg-slate-100 rounded-lg flex-shrink-0 overflow-hidden border">
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img
-                                            src={item.product?.images?.[0]?.image_url || "/placeholder.png"}
+                                            src={getMainImage(item.product?.images)}
                                             alt={item.product.name}
                                             className="w-full h-full object-cover mix-blend-multiply"
                                         />

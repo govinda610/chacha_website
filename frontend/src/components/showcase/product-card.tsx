@@ -12,14 +12,13 @@ interface ProductCardProps {
     inStock?: boolean
 }
 
-export function ProductCard({ variant, title, price, oldPrice, inStock = true }: ProductCardProps) {
+export function ProductCard({ variant, title, price, oldPrice, image, inStock = true }: ProductCardProps) {
     if (variant === "minimal") {
         return (
             <Card className="overflow-hidden border-none shadow-sm hover:shadow-md transition-shadow group">
                 <div className="aspect-square bg-muted relative rounded-t-xl overflow-hidden">
-                    <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/50 text-xs">
-                        [Product Image]
-                    </div>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={image} alt={title} className="w-full h-full object-cover" />
                     {!inStock && (
                         <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
                             <Badge variant="destructive">Out of Stock</Badge>
@@ -50,9 +49,8 @@ export function ProductCard({ variant, title, price, oldPrice, inStock = true }:
                         </Badge>
                     </div>
 
-                    <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
-                        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">IMG</div>
-                    </div>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={image} alt={title} className="w-full h-full object-cover" />
 
                     {/* Quick Actions Overlay */}
                     <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex justify-center gap-2">

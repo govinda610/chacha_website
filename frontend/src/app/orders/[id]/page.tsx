@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator"
 import { ChevronLeft, Loader2, MapPin, Package } from "lucide-react"
 import { format } from "date-fns"
 import { toast } from "sonner"
+import { getMainImage } from "@/lib/utils"
 
 export default function OrderDetailPage() {
     const params = useParams()
@@ -85,7 +86,7 @@ export default function OrderDetailPage() {
                                     <div className="h-20 w-20 bg-slate-100 rounded-lg shrink-0 overflow-hidden border">
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img
-                                            src={item.product?.images?.[0]?.image_url || "/placeholder.png"}
+                                            src={getMainImage(item.product?.images)}
                                             alt={item.product?.name || "Product"}
                                             className="w-full h-full object-cover mix-blend-multiply"
                                         />

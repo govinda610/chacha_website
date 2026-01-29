@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge"
 import { Loader2, ArrowLeft, CreditCard, Truck } from "lucide-react"
 import { toast } from "sonner"
 import { Order, OrderStatus } from "@/types/order"
+import { getMainImage } from "@/lib/utils"
 
 export default function AdminOrderDetailsPage() {
     const params = useParams()
@@ -159,7 +160,14 @@ export default function AdminOrderDetailsPage() {
                             {order.items.map((item) => (
                                 <div key={item.id} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
                                     <div className="flex items-center gap-4">
-                                        <div className="h-16 w-16 rounded bg-muted/20 object-cover" /> {/* Placeholder/Image */}
+                                        <div className="h-16 w-16 rounded bg-muted/20 overflow-hidden border">
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img
+                                                src={getMainImage(item.product?.images)}
+                                                alt={item.product_name}
+                                                className="w-full h-full object-cover mix-blend-multiply"
+                                            />
+                                        </div>
                                         <div>
                                             <p className="font-medium">{item.product_name}</p>
                                             <p className="text-sm text-muted-foreground">SKU: {item.sku}</p>

@@ -1,5 +1,6 @@
 "use client"
 
+import { getMainImage } from "@/lib/utils"
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import Image from "next/image"
@@ -37,8 +38,8 @@ export default function ProductDetailPage() {
             try {
                 const data = await productService.getProduct(slug)
                 setProduct(data)
-                if (data.images && data.images.main) {
-                    setActiveImage(data.images.main)
+                if (data.images) {
+                    setActiveImage(getMainImage(data.images))
                 }
                 if (data.variants && data.variants.length > 0) {
                     setSelectedVariant(data.variants[0])
@@ -102,18 +103,18 @@ export default function ProductDetailPage() {
                             </div>
                         )}
                     </div>
-                    {product.images && (
+                    {product.images && product.images.length > 0 && (
                         <div className="flex gap-4 overflow-x-auto pb-2">
-                            {product.images?.main && (
+                            {product.images.map((img, idx) => (
                                 <button
-                                    className={`relative aspect-square w-20 flex-shrink-0 overflow-hidden rounded-md border ${activeImage === product.images?.main ? "ring-2 ring-primary" : ""
+                                    key={idx}
+                                    className={`relative aspect-square w-20 flex-shrink-0 overflow-hidden rounded-md border ${activeImage === img.image_url ? "ring-2 ring-primary" : ""
                                         }`}
-                                    onClick={() => setActiveImage(product.images?.main || "")}
+                                    onClick={() => setActiveImage(img.image_url || "")}
                                 >
-                                    <Image src={product.images?.main || ""} alt="Main" fill className="object-cover" />
+                                    <Image src={img.image_url || "/placeholder.png"} alt="Product Image" fill className="object-cover" />
                                 </button>
-                            )}
-                            {/* Add check for other images logic if needed, currently assumes structure */}
+                            ))}
                         </div>
                     )}
                 </div>

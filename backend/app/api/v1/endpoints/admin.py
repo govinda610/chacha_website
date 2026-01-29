@@ -26,6 +26,7 @@ router = APIRouter()
 
 
 # ============== Admin Middleware ==============
+class DashboardStats(BaseModel):
     order_count: int
     average_order_value: float
     low_stock_count: int

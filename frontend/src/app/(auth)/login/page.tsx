@@ -33,7 +33,12 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>
 
-export default function LoginPage() {
+import { Suspense } from "react"
+
+// ... imports (kept same, handled by tool context usually, but here I need to be careful with imports if I replace whole file)
+// Actually I will replace the main function and split it.
+
+function LoginForm() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const { login } = useAuth()
@@ -134,5 +139,13 @@ export default function LoginPage() {
                 </Card>
             </div>
         </div>
+    )
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<div className="flex h-screen items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+            <LoginForm />
+        </Suspense>
     )
 }

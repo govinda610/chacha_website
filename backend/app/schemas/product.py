@@ -60,3 +60,9 @@ class Product(ProductBase):
 
     class Config:
         from_attributes = True
+
+class ProductCreate(ProductBase):
+    pass
+
+class ProductUpdate(ProductBase):
+    pass

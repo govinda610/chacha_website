@@ -57,7 +57,7 @@ export interface Product {
     // Relations
     brand?: Brand
     category?: Category
-    images?: ProductImages // Changed from ProductImage[] to match usage: product.images.main
+    images?: ProductImage[]
     variants?: ProductVariant[]
 }
 

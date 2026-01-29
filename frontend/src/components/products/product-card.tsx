@@ -5,7 +5,9 @@ import { ShoppingCart, Eye } from "lucide-react"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
+import { cn, getMainImage } from "@/lib/utils"
+
+
 import type { Product } from "@/types/product"
 import { useCart } from "@/context/cart-context"
 
@@ -48,17 +50,16 @@ export function ProductCard({ product, variant = "default" }: ProductCardProps) 
 
                 {/* Image Area */}
                 <div className="aspect-square relative bg-slate-50 overflow-hidden flex items-center justify-center p-4">
-                    {product.images && product.images.length > 0 ? (
+                    {product.images ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
-                            src={product.images[0].image_url}
+                            src={getMainImage(product.images)}
                             alt={product.name}
-                            className="object-contain w-full h-full mix-blend-multiply transition-transform duration-500 group-hover:scale-110"
+                            className="object-contain mix-blend-multiply transition-transform duration-300 group-hover:scale-110"
                         />
                     ) : (
                         <div className="text-muted-foreground text-xs text-center">No Image</div>
                     )}
-
                     {/* Hover Actions */}
                     <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-[1px]">
                         <Link href={`/products/${product.slug}`}>
