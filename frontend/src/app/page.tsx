@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { ArrowRight, Truck, ShieldCheck, Clock, Award } from "lucide-react"
+import { ArrowRight, Truck, ShieldCheck, Clock, Award, Star, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ProductCard } from "@/components/products/product-card"
+import { Hero } from "@/components/home/hero"
 import { productService } from "@/services/products"
+import { motion } from "framer-motion"
 import type { Product, Category } from "@/types/product"
 import { toast } from "sonner"
 
@@ -34,71 +36,53 @@ export default function HomePage() {
   }, [])
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-background">
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-900 via-primary to-blue-500 text-white overflow-hidden py-16 lg:py-24">
-        <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10"></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-2xl space-y-6 animate-in slide-in-from-left duration-700">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-sm font-medium">
-              <Award className="h-4 w-4 text-yellow-300" />
-              <span>Official Distributor for Noris Medical</span>
-            </div>
-            <h1 className="text-4xl lg:text-6xl font-extrabold tracking-tight leading-none">
-              Premium Dental Implants & Supplies
-            </h1>
-            <p className="text-lg lg:text-xl text-blue-100 max-w-xl leading-relaxed">
-              Same-day delivery for Jaipur clinics. Authentic products, simplified procurement, and exclusive B2B pricing.
-            </p>
-            <div className="flex flex-wrap gap-4 pt-4">
-              <Link href="/products">
-                <Button size="lg" className="bg-white text-primary hover:bg-blue-50 font-bold rounded-xl h-12">
-                  Shop Catalog
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-              <Link href="/register">
-                <Button size="lg" variant="outline" className="bg-transparent text-white border-white/30 hover:bg-white/10 font-medium rounded-xl h-12">
-                  Create Professional Account
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <Hero />
 
-      {/* Trust Indicators */}
-      <section className="bg-white border-b">
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      {/* Trust Indicators - Refined */}
+      <section className="relative z-20 -mt-10 lg:-mt-16 pb-12">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+            className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 lg:p-6 glass rounded-3xl shadow-2xl shadow-primary/5"
+          >
             {[
-              { icon: Truck, title: "Express Delivery", desc: "Same-day in Jaipur" },
-              { icon: ShieldCheck, title: "100% Authentic", desc: "Authorized Distributor" },
-              { icon: Clock, title: "24/7 Ordering", desc: "Digital Procurement" },
-              { icon: Award, title: "Premium Support", desc: "Expert Assistance" }
+              { icon: Truck, title: "Express Delivery", desc: "Same-day in Jaipur", color: "text-primary" },
+              { icon: ShieldCheck, title: "100% Authentic", desc: "Authorized Distributor", color: "text-secondary" },
+              { icon: Clock, title: "24/7 Ordering", desc: "Digital Procurement", color: "text-teal-600" },
+              { icon: Star, title: "Premium Grade", desc: "Certification Verified", color: "text-accent" }
             ].map((feature, i) => (
-              <div key={i} className="flex items-start gap-4 p-4 rounded-xl bg-slate-50 hover:bg-blue-50 transition-colors">
-                <div className="h-10 w-10 bg-white rounded-full shadow-sm flex items-center justify-center text-primary shrink-0">
-                  <feature.icon className="h-5 w-5" />
+              <div key={i} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-primary/5 transition-colors group">
+                <div className={`h-12 w-12 rounded-2xl bg-white shadow-sm flex items-center justify-center ${feature.color} shrink-0 group-hover:scale-110 transition-transform`}>
+                  <feature.icon className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-foreground">{feature.title}</h3>
-                  <p className="text-sm text-muted-foreground">{feature.desc}</p>
+                  <h3 className="font-bold text-foreground text-sm lg:text-base font-serif">{feature.title}</h3>
+                  <p className="text-xs text-muted-foreground font-body">{feature.desc}</p>
                 </div>
               </div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Featured Products */}
-      <section className="py-16 bg-slate-50/50">
-        <div className="container mx-auto px-4 space-y-8">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl lg:text-3xl font-bold text-foreground">New Arrivals</h2>
-            <Link href="/products" className="text-primary font-medium hover:underline flex items-center gap-1">
-              View All <ArrowRight className="h-4 w-4" />
+      {/* Featured Products - Refined */}
+      <section className="py-24 bg-surface/50">
+        <div className="container mx-auto px-4 space-y-12">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/10 text-secondary text-xs font-bold font-space-grotesk uppercase tracking-tight">
+                <Zap className="h-3 w-3" />
+                Latest In Stock
+              </div>
+              <h2 className="text-3xl lg:text-5xl font-serif font-black text-foreground">Featured Arrivals.</h2>
+            </div>
+            <Link href="/products" className="group text-primary font-bold font-space-grotesk flex items-center gap-2 hover:translate-x-1 transition-transform">
+              Explore Full Collection <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform text-secondary" />
             </Link>
           </div>
 
