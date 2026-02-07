@@ -114,6 +114,14 @@ export function Header() {
                     <div className="flex items-center gap-3 lg:gap-5">
                         {user ? (
                             <div className="flex items-center gap-3">
+                                {user.role?.toLowerCase() === 'admin' && (
+                                    <Link href="/admin">
+                                        <Button variant="ghost" className="h-12 px-4 gap-3 font-space-grotesk font-bold text-sm hover:bg-primary/5 rounded-2xl transition-all">
+                                            <Grid className="h-5 w-5 text-primary" />
+                                            <span className="hidden xl:inline text-foreground">Admin</span>
+                                        </Button>
+                                    </Link>
+                                )}
                                 <Link href="/orders">
                                     <Button variant="ghost" className="h-12 px-4 gap-3 font-space-grotesk font-bold text-sm hover:bg-primary/5 rounded-2xl transition-all">
                                         <User className="h-5 w-5 text-primary" />

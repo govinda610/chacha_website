@@ -15,6 +15,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Loader2, DollarSign, ShoppingCart, Package, Users } from "lucide-react"
 
+import { adminService } from "@/services/admin"
+
 interface DashboardStats {
     total_revenue: number
     order_count: number
@@ -39,17 +41,8 @@ export default function AdminDashboardPage() {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                // In a real app we would use an API client
-                const token = localStorage.getItem("token")
-                const response = await fetch("http://localhost:8000/api/v1/admin/dashboard", {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                })
-                if (response.ok) {
-                    const data = await response.json()
-                    setStats(data)
-                }
+                const data = await adminService.getDashboardStats()
+                setStats(data)
             } catch (error) {
                 console.error("Failed to fetch dashboard stats", error)
             } finally {

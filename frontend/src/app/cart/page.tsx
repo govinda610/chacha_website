@@ -18,7 +18,7 @@ export default function CartPage() {
 
     if (items.length === 0) {
         return (
-            <div className="container mx-auto px-4 py-16 flex flex-col items-center justify-center text-center space-y-6">
+            <div className="container mx-auto px-4 py-12 mt-32 lg:mt-40 flex flex-col items-center justify-center text-center space-y-6">
                 <div className="h-24 w-24 bg-slate-100 rounded-full flex items-center justify-center text-muted-foreground">
                     <ShoppingBag className="h-10 w-10" />
                 </div>
@@ -44,7 +44,7 @@ export default function CartPage() {
     const total = subtotal + gst
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 mt-32 lg:mt-40">
             <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

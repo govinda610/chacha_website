@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Loader2, MoreHorizontal, Search, Plus, Trash2 } from "lucide-react"
-// import { BulkActions } from "@/components/admin/products/bulk-actions" // Temporarily disabled or verify existence
+import { BulkActions } from "@/components/admin/products/bulk-actions"
 import { toast } from "sonner"
 import { adminService } from "@/services/admin"
 import { ProductForm } from "@/components/admin/products/product-form"
@@ -150,7 +150,7 @@ export default function AdminProductsPage() {
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    {/* <BulkActions /> */}
+                    <BulkActions />
                     <Dialog open={isDialogOpen} onOpenChange={(open) => {
                         setIsDialogOpen(open)
                         if (!open) setSelectedProduct(undefined)

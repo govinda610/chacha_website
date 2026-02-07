@@ -24,6 +24,8 @@ import { toast } from "sonner"
 import { Order, OrderStatus } from "@/types/order"
 import { getMainImage } from "@/lib/utils"
 
+import { api } from "@/lib/axios"
+
 export default function AdminOrderDetailsPage() {
     const params = useParams()
     const router = useRouter()
@@ -36,33 +38,11 @@ export default function AdminOrderDetailsPage() {
     useEffect(() => {
         const fetchOrder = async () => {
             try {
-                const token = localStorage.getItem("token")
-                // Assuming we have an endpoint for single order details for admin.
-                // The list endpoint returns simplified objects.
-                // We might need to check if we created a specific GET /admin/orders/{id}.
-                // Let's assume we reuse the generic order details logic or added it.
-                // Re-checking admin.py... I think we might have missed a specific GET /orders/{id} in admin.py!
-                // We only added list and status update.
-                // We can use the user-facing endpoint /api/v1/orders/{id} IF the admin is allowed to use it?
-                // Or better, I should have added GET /admin/orders/{id}. 
-                // Let's implement this page assuming I'll fix the backend in a moment if missing.
-                // Actually, let's use the URL standard: /api/v1/admin/orders/{id}
-
-                const response = await fetch(`http://localhost:8000/api/v1/admin/orders/${id}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                })
-
-                if (response.ok) {
-                    const data = await response.json()
-                    setOrder(data) // admin endpoint usually returns flat object or nested? 
-                    // Let's assume it returns standard Order schema including items.
-                } else {
-                    toast.error("Failed to fetch order details")
-                }
+                const response = await api.get(`/admin/orders/${id}`)
+                setOrder(response.data)
             } catch (error) {
                 console.error("Error fetching order:", error)
+                toast.error("Failed to fetch order details")
             } finally {
                 setLoading(false)
             }
@@ -73,20 +53,7 @@ export default function AdminOrderDetailsPage() {
     const handleStatusUpdate = async (newStatus: OrderStatus) => {
         setUpdating(true)
         try {
-            const token = localStorage.getItem("token")
-            const response = await fetch(`http://localhost:8000/api/v1/admin/orders/${id}/status`, {
-                method: "PUT",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ status: newStatus })
-            })
-
-            if (!response.ok) {
-                throw new Error("Failed to update status")
-            }
-
+            await api.put(`/admin/orders/${id}/status`, { status: newStatus })
             setOrder(prev => prev ? { ...prev, status: newStatus } : null)
             toast.success("Order status updated")
         } catch {

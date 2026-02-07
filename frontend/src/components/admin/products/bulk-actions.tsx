@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { api } from "@/lib/axios"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -47,21 +48,13 @@ export function BulkActions() {
         formData.append("file", file)
 
         try {
-            const token = localStorage.getItem("token")
-            const response = await fetch("http://localhost:8000/api/v1/admin/products/bulk-upload", {
-                method: "POST",
+            const response = await api.post("/admin/products/bulk-upload", formData, {
                 headers: {
-                    Authorization: `Bearer ${token}`
-                },
-                body: formData
+                    "Content-Type": "multipart/form-data"
+                }
             })
 
-            if (!response.ok) {
-                const error = await response.json()
-                throw new Error(error.detail || "Upload failed")
-            }
-
-            const result = await response.json()
+            const result = response.data
             toast.success(`Import complete: ${result.success_count} created, ${result.error_count} errors`)
             setFile(null)
         } catch (error: any) {

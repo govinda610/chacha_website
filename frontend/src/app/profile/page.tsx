@@ -92,115 +92,117 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="container flex flex-col items-center py-10 space-y-8">
-            <div className="flex w-full max-w-2xl flex-col items-center space-y-4">
-                <Avatar className="h-24 w-24">
-                    <AvatarImage src="" />
-                    <AvatarFallback>
-                        <UserIcon className="h-12 w-12" />
-                    </AvatarFallback>
-                </Avatar>
-                <div className="text-center">
-                    <h1 className="text-2xl font-bold">{user.full_name}</h1>
-                    <p className="text-muted-foreground">{user.email}</p>
+        <div className="container mx-auto py-10 px-4 mt-32 lg:mt-40">
+            <div className="max-w-4xl mx-auto flex flex-col items-center space-y-8">
+                <div className="flex w-full max-w-2xl flex-col items-center space-y-4">
+                    <Avatar className="h-24 w-24">
+                        <AvatarImage src="" />
+                        <AvatarFallback>
+                            <UserIcon className="h-12 w-12" />
+                        </AvatarFallback>
+                    </Avatar>
+                    <div className="text-center">
+                        <h1 className="text-2xl font-bold">{user.full_name}</h1>
+                        <p className="text-muted-foreground">{user.email}</p>
+                    </div>
                 </div>
-            </div>
 
-            <Card className="w-full max-w-2xl">
-                <CardHeader>
-                    <CardTitle>Profile Details</CardTitle>
-                    <CardDescription>
-                        Manage your personal information and business details
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <Card className="w-full max-w-2xl">
+                    <CardHeader>
+                        <CardTitle>Profile Details</CardTitle>
+                        <CardDescription>
+                            Manage your personal information and business details
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
 
-                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                <FormField
-                                    control={form.control}
-                                    name="full_name"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Full Name</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="Dr. John Doe" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                    <FormField
+                                        control={form.control}
+                                        name="full_name"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Full Name</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="Dr. John Doe" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
 
-                                <div className="space-y-2">
-                                    <FormLabel>Email</FormLabel>
-                                    <Input value={user.email} disabled />
-                                    <FormDescription>Email cannot be changed</FormDescription>
+                                    <div className="space-y-2">
+                                        <FormLabel>Email</FormLabel>
+                                        <Input value={user.email} disabled />
+                                        <FormDescription>Email cannot be changed</FormDescription>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                <FormField
-                                    control={form.control}
-                                    name="phone"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Phone</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="9876543210" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
+                                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                    <FormField
+                                        control={form.control}
+                                        name="phone"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Phone</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="9876543210" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
 
-                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                <FormField
-                                    control={form.control}
-                                    name="dental_license"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Dental License</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="License #" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="gst_number"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>GST Number</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="GSTIN" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
+                                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                    <FormField
+                                        control={form.control}
+                                        name="dental_license"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Dental License</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="License #" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="gst_number"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>GST Number</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="GSTIN" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
 
-                            <div className="flex justify-between pt-4">
-                                <Button type="button" variant="destructive" onClick={logout}>
-                                    <LogOut className="mr-2 h-4 w-4" />
-                                    Logout
-                                </Button>
-                                <Button type="submit" disabled={isSaving}>
-                                    {isSaving && (
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    )}
-                                    Save Changes
-                                </Button>
-                            </div>
+                                <div className="flex justify-between pt-4">
+                                    <Button type="button" variant="destructive" onClick={logout}>
+                                        <LogOut className="mr-2 h-4 w-4" />
+                                        Logout
+                                    </Button>
+                                    <Button type="submit" disabled={isSaving}>
+                                        {isSaving && (
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        )}
+                                        Save Changes
+                                    </Button>
+                                </div>
 
-                        </form>
-                    </Form>
-                </CardContent>
-            </Card>
+                            </form>
+                        </Form>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     )
 }

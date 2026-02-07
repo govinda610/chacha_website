@@ -12,11 +12,8 @@ app = FastAPI(
     version="0.1.0"
 )
 
-# Set up CORS
-origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
+# Set up CORS - allow all in development for mobile testing
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
