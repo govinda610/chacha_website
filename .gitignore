@@ -10,12 +10,27 @@ noris_product_cat_*.pdf
 *.xlsx
 enhanced_prompt.md
 initial_prompt.md
+prd.md
+tasks_master.md
+analyze_products.py
+audit_ghosts.py
+audit_phase1_3.py
+deep_code_audit.py
+deep_data_audit.py
+verify_source.py
+backend/tests/test_admin_api.py
+dev.log
 
 # Environment & DB
 .env
+.env.local
+.env.*.local
+.env.development
+.env.production
 venv/
 *.db
 *.db-journal
+*.sqlite
 
 # Frontend
 node_modules/
@@ -23,6 +38,12 @@ node_modules/
 dist/
 build/
 .pnpm-debug.log
+
+# Media (large files)
+*.mp4
+*.mov
+*.gif
+!website_tour.gif
 
 # System
 .DS_Store
